@@ -1,0 +1,6 @@
+{
+  "appTitle": "room_finder_flutter_app",
+  "@appTitle": {
+    "description": "The title of the application"
+  }
+}
