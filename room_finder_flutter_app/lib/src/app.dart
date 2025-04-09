@@ -44,8 +44,13 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         backgroundColor: Color.fromRGBO(0, 93, 64, 1),
       ),
+      backgroundColor: Colors.white,
       body: Center(
-        child: Container(),
+        child: InteractiveViewer(
+          child: Image(
+            image: AssetImage("images/library_tower_floor_6.png"),
+          ),
+        ),
       ),
     );
   }

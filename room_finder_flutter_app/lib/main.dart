@@ -1,8 +1,88 @@
- import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:room_finder_flutter_app/src/backend/node.dart';
 
-import 'src/app.dart';
 import 'src/backend/graph.dart';
+
+/// The Widget that configures your application.
+class MyApp extends StatelessWidget {
+  const MyApp({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: "BMaps",
+      theme: ThemeData(
+        primarySwatch: Colors.green,
+      ),
+      home: MyHomePage(
+        title: "BMaps"
+      ),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  MyHomePage({super.key, required this.title});
+
+  final String title;
+
+  @override _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          widget.title,
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        backgroundColor: Color.fromRGBO(0, 93, 64, 1),
+      ),
+      bottomNavigationBar: SizedBox(
+        height: 100, 
+        child: BottomNavigationBar(
+          backgroundColor: Color.fromRGBO(0, 93, 64, 1),
+
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: SizedBox(),
+              label: "Search Bar 1",
+            ),
+            BottomNavigationBarItem(
+              icon: SizedBox(),
+              label: "Search Bar 2",
+            ),
+          ],
+        ),
+      ),
+      backgroundColor: Colors.white,
+      body: Center(
+        child: InteractiveViewer(
+          constrained: false,
+          boundaryMargin: EdgeInsets.all(200.0),
+          minScale: 0.1,
+          maxScale: 7,
+          scaleFactor: 0.1,
+          child: const Image(
+            //fit: BoxFit.cover,
+            image: AssetImage("assets/images/library_tower_floor_6.png"),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 
 void main() async {
   // Run the app and pass in the SettingsController. The app listens to the
