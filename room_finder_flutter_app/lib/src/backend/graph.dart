@@ -11,6 +11,7 @@ import 'dart:math';
 class Graph {
   Map<({int floor, int index}), Node> _nodes = {};
   Map<Node, int> distances = {};
+  Set<String> rooms_list = {};
   int _nodes_length = 0;
 
   //this is a change
@@ -48,7 +49,11 @@ class Graph {
       Node new_node = new Node(floor, i, xPos, yPos, rooms, connections);
       _nodes[(floor : floor, index : i)] = new_node;
       distances[new_node] = 1000000;
-      //print(new_node.getRooms());
+      for (String room in new_node.getRooms()) {
+        if (!rooms_list.contains(room)) {
+          rooms_list.add(room);
+        }
+      }
     }
   }
 
@@ -57,7 +62,9 @@ class Graph {
   }
 
 
-  Map<Node, int> pathFinder(Graph graph, Node ?source, Node ?destination){
+  Map<Node, int> pathFinder(Graph graph, String source_room, String dest_room){
+    Node source = getNodeWithRoom(source_room);
+    Node destination = getNodeWithRoom(dest_room);
     final distances = <Node, int>{};
     final previous = <Node, Node?>{};
     final visited = <Node>{};
@@ -106,84 +113,20 @@ class Graph {
       shortest_path[current] = distances[current]!;
       current = previous[current];
     }
-    return shortest_path;
+    return Map.fromEntries(shortest_path.entries.toList().reversed);
   }
 
-  /*
-  Map<Node, int> dijkstraShortestPath(
-    Map<({int floor, int index}), Node> graph,
-    ({int floor, int index}) startKey,
-    ({int floor, int index}) endKey
-  ) {
-    final distance = <({int floor, int index}), double>{};
-    final previous = <({int floor, int index}), ({int floor, int index})?>{};
-    final visited = <({int floor, int index})>{};
-
-    // Priority queue (min-heap behavior using SplayTreeMap)
-    final priorityQueue = SplayTreeMap<({int floor, int index}), double>(
-      (a, b) {
-        // compare based on distances
-        return (distance[a] ?? double.infinity)
-            .compareTo(distance[b] ?? double.infinity);
-      },
-    );
-
-    // Initialize distances
-    for (var key in graph.keys) {
-      distance[key] = double.infinity;
-      previous[key] = null;
+  // get the node containing the given room
+  // should NEVER be passed a nonexistent room
+  Node getNodeWithRoom(String room) {
+    var nodes_list = _nodes.entries.toList();
+    Node ret = nodes_list[0].value;
+    for (var entry in nodes_list) {
+      if (entry.value.getRooms().contains(room))
+        ret = entry.value;
     }
-
-    distance[startKey] = 0;
-    priorityQueue[startKey] = 0;
-
-    while (priorityQueue.isNotEmpty) {
-      var currentKey = priorityQueue.firstKey();
-      priorityQueue.remove(currentKey);
-
-      if (visited.contains(currentKey)) continue;
-      visited.add(currentKey!);
-
-      if (currentKey == endKey) break;
-
-      var currentNode = graph[currentKey]!;
-      for (var neighborKey in currentNode.getAdjacentNodes()) {
-        if (!graph.containsKey(neighborKey)) continue;
-
-        var neighborNode = graph[neighborKey]!;
-        var weight = euclideanDistance(currentNode, neighborNode);
-        var altDist = (distance[currentKey] ?? double.infinity) + weight;
-
-        if (altDist < (distance[neighborKey] ?? double.infinity)) {
-          distance[neighborKey] = altDist;
-          previous[neighborKey] = currentKey;
-          priorityQueue[neighborKey] = altDist;
-        }
-      }
-    }
-
-    // Reconstruct the path from endKey to startKey
-    Map<Node, int> path = {};
-    var step = 0;
-    var current = endKey;
-    if (previous[current] != null || current == startKey) {
-      while (current != null && previous.containsKey(current)) {
-        path[graph[current]!] = step++;
-        if (current == startKey) break;
-        current = previous[current]!;
-      }
-    }
-
-    return Map.fromEntries(path.entries.toList().reversed);
+    return ret;
   }
-
-  double euclideanDistance(Node a, Node b) {
-    double dx = (a.getXPos() - b.getXPos()).toDouble();
-    double dy = (a.getYPos() - b.getYPos()).toDouble();
-    return sqrt(dx * dx + dy * dy);
-  }
-  */
-
 
   //accessors
   Map<({int floor, int index}), Node> getNodes() {
@@ -196,5 +139,9 @@ class Graph {
 
   int getNodesLength() {
     return _nodes_length;
+  }
+
+  List<String> getRoomsList() {
+    return rooms_list.toList();
   }
 }
