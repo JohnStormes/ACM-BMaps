@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:room_finder_flutter_app/src/backend/node.dart';
-import 'ImageWithLines.dart';
+import 'Draw.dart';
 
 import 'src/backend/graph.dart';
+
+const Color BING_GREEN =Color.fromRGBO(0, 93, 64, 1);
 
 /// The Widget that configures your application.
 class MyApp extends StatelessWidget {
@@ -34,6 +36,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  String start = "T608";
+  String destination = "T608";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,36 +52,173 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           textAlign: TextAlign.center,
         ),
-        backgroundColor: Color.fromRGBO(0, 93, 64, 1),
-      ),
-      bottomNavigationBar: SizedBox(
-        height: 100, 
-        child: BottomNavigationBar(
-          backgroundColor: Color.fromRGBO(0, 93, 64, 1),
-
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: SizedBox(),
-              label: "Search Bar 1",
-            ),
-            BottomNavigationBarItem(
-              icon: SizedBox(),
-              label: "Search Bar 2",
-            ),
-          ],
-        ),
+        backgroundColor: BING_GREEN,
+        centerTitle: true,
       ),
       backgroundColor: Colors.white,
-      body: Center(
-        child: InteractiveViewer(
-          constrained: false,
-          boundaryMargin: EdgeInsets.all(200.0),
-          minScale: 0.1,
-          maxScale: 7,
-          scaleFactor: 1,
-          child: ImageWithLines.new()
-        ),
+      body: Stack(
+        children: [
+          // centered interactive viewer
+          Center(
+            child: InteractiveViewer(
+              constrained: false,
+              boundaryMargin: EdgeInsets.all(200.0),
+              minScale: 0.1,
+              maxScale: 7,
+              scaleFactor: 1,
+              child: ImageWithLines.new()
+            ),
+          ),
+
+          // buttons
+          Positioned(
+            bottom: 20,
+            left: 20,
+            child: SizedBox(
+              width: 180,
+              height: 50,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  _openSearch(0);
+                  loadPath(start, destination);
+                },
+                label: Text(
+                  start,
+                  style: const TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+                icon: const Icon(
+                  Icons.search, 
+                  color: Colors.white
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: BING_GREEN
+                ),
+              ),
+            ),
+          ),
+
+          Positioned(
+            bottom: 20,
+            right: 20,
+            child: SizedBox(
+              width: 180,
+              height: 50,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  _openSearch(1);
+                  loadPath(start, destination);
+                },
+                label: Text(
+                  destination,
+                  style: const TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+                icon: const Icon(
+                  Icons.search, 
+                  color: Colors.white
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: BING_GREEN
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
+    );
+  }
+
+  void _openSearch(int index) async {
+    final result = await showSearch(
+      context: context,
+      delegate: CustomSearchDelegate(index),
+    );
+
+    if (result != null) {
+      setState(() {
+        if (index == 0) {
+          start = result;
+        } else if (index == 1) {
+          destination = result;
+        }
+      });
+    }
+  }
+}
+
+class CustomSearchDelegate extends SearchDelegate {
+  int button_index = 0;
+  List<String> search_terms = graph.getRoomsList();
+  CustomSearchDelegate(int aButton_index) {
+    button_index = aButton_index;
+  }
+
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return [
+      IconButton(
+        icon: const Icon(Icons.clear),
+        onPressed: () {
+          query = '';
+        },
+      ),
+    ];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () {
+        close(context, null);
+      }
+    );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    List<String> matchQuery = [];
+    for (var fruit in search_terms) {
+      if (fruit.toLowerCase().contains(query.toLowerCase())) {
+        matchQuery.add(fruit);
+      }
+    }
+    return ListView.builder(
+      itemCount: matchQuery.length,
+      itemBuilder: (context, index) {
+        var result  = matchQuery[index];
+        return ListTile(
+          title: Text(result),
+          onTap: () {
+            close(context, result);
+          }
+        );
+      },
+    );
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    List<String> matchQuery = [];
+    for (var fruit in search_terms) {
+      if (fruit.toLowerCase().contains(query.toLowerCase())) {
+        matchQuery.add(fruit);
+      }
+    }
+    return ListView.builder(
+      itemCount: matchQuery.length,
+      itemBuilder: (context, index) {
+        var result  = matchQuery[index];
+        return ListTile(
+          title: Text(result),
+          onTap: () {
+            close(context, result);
+          }
+        );
+      },
     );
   }
 }
@@ -87,22 +229,6 @@ void main() async {
   // SettingsController for changes, then passes it further down to the
   // SettingsView.
   WidgetsFlutterBinding.ensureInitialized();
-  await LoadGraph();
+  await loadGraph();
   runApp(MyApp());
-
-  // testing
-  Graph test = Graph();
-  // ALWAYS await when loading data such that app waits for data to be loaded before proceeding
-  await test.readJSON("assets/data/library_tower_floor_6.json");
-  var nodes = test.getNodes();
-  int nodes_length = test.getNodesLength();
-
-  Map<Node, int> list = test.pathFinder(test, test.getNodes()[(floor : 6, index : 0)], test.getNodes()[(floor : 6, index : 22)]);
-  list.forEach((key, value) { print(key.getFloorAndIndex().toString() + ' + ' + value.toString()); } );
-
-  print("\nrooms list:");
-
-  for (int i = 0; i < nodes_length; i++) {
-    print(nodes[(floor : 6, index : i)]?.getRooms());
-  }
 }
