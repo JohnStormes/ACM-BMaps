@@ -137,7 +137,7 @@
             "xPos" : 309,
             "yPos" : 205,
             "rooms" : "STR11",
-            "connections" : "6-0,6-21"
+            "connections" : "6-0, 6-13"
         }
     }
 }

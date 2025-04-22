@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:room_finder_flutter_app/src/backend/node.dart';
+import 'ImageWithLines.dart';
 
 import 'src/backend/graph.dart';
 
@@ -72,11 +73,8 @@ class _MyHomePageState extends State<MyHomePage> {
           boundaryMargin: EdgeInsets.all(200.0),
           minScale: 0.1,
           maxScale: 7,
-          scaleFactor: 0.1,
-          child: const Image(
-            //fit: BoxFit.cover,
-            image: AssetImage("assets/images/library_tower_floor_6.png"),
-          ),
+          scaleFactor: 1,
+          child: ImageWithLines.new()
         ),
       ),
     );
@@ -88,6 +86,8 @@ void main() async {
   // Run the app and pass in the SettingsController. The app listens to the
   // SettingsController for changes, then passes it further down to the
   // SettingsView.
+  WidgetsFlutterBinding.ensureInitialized();
+  await LoadGraph();
   runApp(MyApp());
 
   // testing
@@ -97,7 +97,7 @@ void main() async {
   var nodes = test.getNodes();
   int nodes_length = test.getNodesLength();
 
-  Map<Node, int> list = test.pathFinder(test, nodes[(floor : 6, index : 0)]);
+  Map<Node, int> list = test.pathFinder(test, test.getNodes()[(floor : 6, index : 0)], test.getNodes()[(floor : 6, index : 22)]);
   list.forEach((key, value) { print(key.getFloorAndIndex().toString() + ' + ' + value.toString()); } );
 
   print("\nrooms list:");
