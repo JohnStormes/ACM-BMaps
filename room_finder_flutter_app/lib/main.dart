@@ -10,7 +10,11 @@ const Color BING_GREEN =Color.fromRGBO(0, 93, 64, 1);
 class MyApp extends StatelessWidget {
   const MyApp({
     super.key,
+    required this.graph,
   });
+
+  // passed in from main when app is started
+  final Graph graph;
 
   @override
   Widget build(BuildContext context) {
@@ -21,36 +25,53 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
       ),
       home: MyHomePage(
-        title: "BMaps"
+        title: "BMaps",
+        graph: graph,
       ),
     );
   }
 }
 
+// widget created in MyApp, which creates the _MyHomePageState custom state
 class MyHomePage extends StatefulWidget {
-  MyHomePage({super.key, required this.title});
+  MyHomePage({super.key, required this.title, required this.graph});
 
   final String title;
+  // passed in from MyApp when homepage is created
+  final Graph graph;
 
-  @override _MyHomePageState createState() => _MyHomePageState();
+  @override _MyHomePageState createState() => _MyHomePageState(graph);
 }
 
+// PRIMARY HOME PAGE CLASS
+// contains most home page widgets and functionality
 class _MyHomePageState extends State<MyHomePage> {
+  // these strings change as rooms are selected
   String start = "Start";
   String destination = "Destination";
+  // curren graph
+  Graph graph = Graph();
+  // list of values for the current path
   List<({int x, int y})> path_list = [];
 
+  _MyHomePageState(Graph a_graph) {
+    graph = a_graph;
+  }
+
+  // initializes the path, ran every time a new room is chosen
   Future<void> _loadInitialPath() async {
-    final list = await loadPath(start, destination);
+    final list = await loadPath(graph, start, destination);
     setState(() {
       path_list = list;
     });
   }
 
+  // opens a search menu, gets result, and updates the start and destination string variables
+  // finally, it updates the path with loadPath, and reloads the home page
   void _openSearch(int index) async {
     final result = await showSearch(
       context: context,
-      delegate: CustomSearchDelegate(index),
+      delegate: CustomSearchDelegate(index, graph),
     );
 
     if (result != null) {
@@ -61,7 +82,8 @@ class _MyHomePageState extends State<MyHomePage> {
           destination = result;
         }
       });
-      final list = await loadPath(start, destination);
+      final list = await loadPath(graph, start, destination);
+      // reload home page
       setState(() {
         path_list = list;
       });
@@ -69,6 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
+  // home page front end
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -95,11 +118,14 @@ class _MyHomePageState extends State<MyHomePage> {
               minScale: 0.1,
               maxScale: 7,
               scaleFactor: 1,
+              // creates the image widget from the Draw.dart file
               child: ImageWithLines.new(path_list: path_list)
             ),
           ),
 
           // buttons
+
+          // left search button
           Positioned(
             bottom: 20,
             left: 20,
@@ -107,9 +133,9 @@ class _MyHomePageState extends State<MyHomePage> {
               width: 180,
               height: 50,
               child: ElevatedButton.icon(
+                // left search button activates the code below onPressed here
                 onPressed: () {
                   _openSearch(0);
-                  loadPath(start, destination);
                 },
                 label: Text(
                   start,
@@ -128,6 +154,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
 
+          // right search button
           Positioned(
             bottom: 20,
             right: 20,
@@ -135,9 +162,9 @@ class _MyHomePageState extends State<MyHomePage> {
               width: 180,
               height: 50,
               child: ElevatedButton.icon(
+                // right search button activates the code below onPressed here
                 onPressed: () {
                   _openSearch(1);
-                  loadPath(start, destination);
                 },
                 label: Text(
                   destination,
@@ -161,14 +188,22 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
+// Properties for the search window, takes in which button we are using (start or destination),
+// and the graph so that it can get a list of all the rooms in the graph
 class CustomSearchDelegate extends SearchDelegate {
+  // this classes instance of the current graph
+  Graph graph = Graph();
+
   int button_index = 0;
-  List<String> search_terms = graph.getRoomsList();
-  CustomSearchDelegate(int aButton_index) {
+  List<String> search_terms = [];
+  CustomSearchDelegate(int aButton_index, Graph a_graph) {
     button_index = aButton_index;
+    graph = a_graph;
+    search_terms = graph.getRoomsList();
   }
 
   @override
+  // button to clear the search list
   List<Widget> buildActions(BuildContext context) {
     return [
       IconButton(
@@ -181,6 +216,7 @@ class CustomSearchDelegate extends SearchDelegate {
   }
 
   @override
+  // button to exit the search page
   Widget buildLeading(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.arrow_back),
@@ -191,11 +227,12 @@ class CustomSearchDelegate extends SearchDelegate {
   }
 
   @override
+  // shows all rooms in search list (same code as buildSuggestions)
   Widget buildResults(BuildContext context) {
     List<String> matchQuery = [];
-    for (var fruit in search_terms) {
-      if (fruit.toLowerCase().contains(query.toLowerCase())) {
-        matchQuery.add(fruit);
+    for (var rooms in search_terms) {
+      if (rooms.toLowerCase().contains(query.toLowerCase())) {
+        matchQuery.add(rooms);
       }
     }
     return ListView.builder(
@@ -213,11 +250,12 @@ class CustomSearchDelegate extends SearchDelegate {
   }
 
   @override
+  // shows suggested rooms in search list (same code as buildResults)
   Widget buildSuggestions(BuildContext context) {
     List<String> matchQuery = [];
-    for (var fruit in search_terms) {
-      if (fruit.toLowerCase().contains(query.toLowerCase())) {
-        matchQuery.add(fruit);
+    for (var rooms in search_terms) {
+      if (rooms.toLowerCase().contains(query.toLowerCase())) {
+        matchQuery.add(rooms);
       }
     }
     return ListView.builder(
@@ -235,12 +273,50 @@ class CustomSearchDelegate extends SearchDelegate {
   }
 }
 
+// loads a graph from a file and passes it back to the caller
+Future<Graph> loadGraph(Graph graph, String file_path) async {
+  // load a JSON file
+  await graph.readJSON(file_path);
+  return graph;
+}
+
+Future<List<({int x, int y})>> loadPath(Graph graph, String start_room, String end_room) async {
+  List<({int x, int y})> new_path_list = [];
+  // if either or one of the rooms isn't set, handle it for the canvas drawer
+  if (start_room == "Start" && end_room == "Destination") {
+    return new_path_list;
+  } else if (start_room == "Start") {
+    new_path_list.add((x : graph.getNodeWithRoom(end_room).getXPos(), y : graph.getNodeWithRoom(end_room).getYPos()));
+    return new_path_list;
+  } else if (end_room == "Destination") {
+    new_path_list.add((x : graph.getNodeWithRoom(start_room).getXPos(), y : graph.getNodeWithRoom(start_room).getYPos()));
+    return new_path_list;
+  }
+
+  // finds path from first to second room
+  path = graph.pathFinder(graph, start_room, end_room);
+  // get the nodes in the path map as a list
+  var indexed_list = path.entries.toList();
+
+  // save the nodes in the path as a list of x and y coordinates
+  for (var entry in indexed_list) {
+    new_path_list.add((x : entry.key.getXPos(), y : entry.key.getYPos()));
+  }
+  return new_path_list;
+}
 
 void main() async {
   // Run the app and pass in the SettingsController. The app listens to the
   // SettingsController for changes, then passes it further down to the
   // SettingsView.
+  // NATIVE GRAPH INSTANCE
+  Graph core_graph = Graph();
+
+  // floorplan files
+  String floor6 = "assets/data/library_tower_floor_6.json";
+
+  // ensure the core_graph is initialized before starting the app!
   WidgetsFlutterBinding.ensureInitialized();
-  await loadGraph();
-  runApp(MyApp());
+  core_graph = await loadGraph(core_graph, floor6);
+  runApp(MyApp(graph: core_graph));
 }
