@@ -61,7 +61,10 @@ class Graph {
     return (sqrt(pow(n1.getXPos() - n2.getXPos(), 2) + pow(n1.getYPos() - n2.getYPos(), 2))).toInt();
   }
 
-
+  // finds the shortest path from source_room to dest_room in the given graph, and returns
+  // the path as a map of Node - distance pairings. The distances are just there for later
+  // use if needed, but for now the implementation of this function turns the map into a list
+  // of x-y coordinates in Main.dart -> loadPath
   Map<Node, int> pathFinder(Graph graph, String source_room, String dest_room){
     Node source = getNodeWithRoom(source_room);
     Node destination = getNodeWithRoom(dest_room);
@@ -118,6 +121,7 @@ class Graph {
 
   // get the node containing the given room
   // should NEVER be passed a nonexistent room
+  // if passed nonexistent room, returns first room in the list of nodes for the graph
   Node getNodeWithRoom(String room) {
     var nodes_list = _nodes.entries.toList();
     Node ret = nodes_list[0].value;
