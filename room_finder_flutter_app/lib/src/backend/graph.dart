@@ -56,32 +56,133 @@ class Graph {
     return (sqrt(pow(n1.getXPos() - n2.getXPos(), 2) + pow(n1.getYPos() - n2.getYPos(), 2))).toInt();
   }
 
-  Map<Node, int> pathFinder(Graph graph, Node ?source){
-    Set<Node> visited = {};
-    if (source == null) {
-      return distances;
+
+  Map<Node, int> pathFinder(Graph graph, Node ?source, Node ?destination){
+    final distances = <Node, int>{};
+    final previous = <Node, Node?>{};
+    final visited = <Node>{};
+
+    if (source == null || destination == null) {
+      print("null node passed into dijkstras");
+      return Map<Node, int>();
+    }
+
+    // initialize the infinite distances and previous nodes
+    for (var node in graph.getNodes().values) {
+      distances[node] = 1 << 30;
+      previous[node] = null;
     }
     distances[source] = 0;
 
     final pq = PriorityQueue<Node>((a, b) => distances[a]! - distances[b]!);
     pq.add(source);
+
     while(pq.isNotEmpty){
       Node current = pq.removeFirst();
-      if(!visited.contains(current)){
-        visited.add(current);
-        for(({int floor, int index}) neighbor_key in current.getAdjacentNodes()){
-          Node? neighbor = getNode(neighbor_key.floor, neighbor_key.index);
-          if (neighbor == null) continue;
-          int distance = distances[current]! + graph.getDist(current, neighbor);
-          if(distances[neighbor]! > distance){
-            distances[neighbor] = distance;
-            pq.add(neighbor);
-          }
+      if(visited.contains(current)) continue;
+
+      visited.add(current);
+
+      // stop early if we reach the destination
+      if (current == destination) break;
+
+      for(({int floor, int index}) neighbor_key in current.getAdjacentNodes()){
+        Node? neighbor = graph.getNode(neighbor_key.floor, neighbor_key.index);
+        if (neighbor == null || visited.contains(neighbor)) continue;
+
+        int distance = distances[current]! + graph.getDist(current, neighbor);
+        if(distances[neighbor]! > distance){
+          distances[neighbor] = distance;
+          previous[neighbor] = current;
+          pq.add(neighbor);
         }
       }
     }
-    return distances;
+
+    // reconstruct the path from destination to source
+    Map<Node, int> shortest_path = {};
+    Node? current = destination;
+    while (current != null) {
+      shortest_path[current] = distances[current]!;
+      current = previous[current];
+    }
+    return shortest_path;
   }
+
+  /*
+  Map<Node, int> dijkstraShortestPath(
+    Map<({int floor, int index}), Node> graph,
+    ({int floor, int index}) startKey,
+    ({int floor, int index}) endKey
+  ) {
+    final distance = <({int floor, int index}), double>{};
+    final previous = <({int floor, int index}), ({int floor, int index})?>{};
+    final visited = <({int floor, int index})>{};
+
+    // Priority queue (min-heap behavior using SplayTreeMap)
+    final priorityQueue = SplayTreeMap<({int floor, int index}), double>(
+      (a, b) {
+        // compare based on distances
+        return (distance[a] ?? double.infinity)
+            .compareTo(distance[b] ?? double.infinity);
+      },
+    );
+
+    // Initialize distances
+    for (var key in graph.keys) {
+      distance[key] = double.infinity;
+      previous[key] = null;
+    }
+
+    distance[startKey] = 0;
+    priorityQueue[startKey] = 0;
+
+    while (priorityQueue.isNotEmpty) {
+      var currentKey = priorityQueue.firstKey();
+      priorityQueue.remove(currentKey);
+
+      if (visited.contains(currentKey)) continue;
+      visited.add(currentKey!);
+
+      if (currentKey == endKey) break;
+
+      var currentNode = graph[currentKey]!;
+      for (var neighborKey in currentNode.getAdjacentNodes()) {
+        if (!graph.containsKey(neighborKey)) continue;
+
+        var neighborNode = graph[neighborKey]!;
+        var weight = euclideanDistance(currentNode, neighborNode);
+        var altDist = (distance[currentKey] ?? double.infinity) + weight;
+
+        if (altDist < (distance[neighborKey] ?? double.infinity)) {
+          distance[neighborKey] = altDist;
+          previous[neighborKey] = currentKey;
+          priorityQueue[neighborKey] = altDist;
+        }
+      }
+    }
+
+    // Reconstruct the path from endKey to startKey
+    Map<Node, int> path = {};
+    var step = 0;
+    var current = endKey;
+    if (previous[current] != null || current == startKey) {
+      while (current != null && previous.containsKey(current)) {
+        path[graph[current]!] = step++;
+        if (current == startKey) break;
+        current = previous[current]!;
+      }
+    }
+
+    return Map.fromEntries(path.entries.toList().reversed);
+  }
+
+  double euclideanDistance(Node a, Node b) {
+    double dx = (a.getXPos() - b.getXPos()).toDouble();
+    double dy = (a.getYPos() - b.getYPos()).toDouble();
+    return sqrt(dx * dx + dy * dy);
+  }
+  */
 
 
   //accessors
