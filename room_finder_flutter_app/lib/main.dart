@@ -36,8 +36,37 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String start = "T608";
-  String destination = "T608";
+  String start = "Start";
+  String destination = "Destination";
+  List<({int x, int y})> path_list = [];
+
+  Future<void> _loadInitialPath() async {
+    final list = await loadPath(start, destination);
+    setState(() {
+      path_list = list;
+    });
+  }
+
+  void _openSearch(int index) async {
+    final result = await showSearch(
+      context: context,
+      delegate: CustomSearchDelegate(index),
+    );
+
+    if (result != null) {
+      setState(() {
+        if (index == 0) {
+          start = result;
+        } else if (index == 1) {
+          destination = result;
+        }
+      });
+      final list = await loadPath(start, destination);
+      setState(() {
+        path_list = list;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
               minScale: 0.1,
               maxScale: 7,
               scaleFactor: 1,
-              child: ImageWithLines.new()
+              child: ImageWithLines.new(path_list: path_list)
             ),
           ),
 
@@ -129,23 +158,6 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
     );
-  }
-
-  void _openSearch(int index) async {
-    final result = await showSearch(
-      context: context,
-      delegate: CustomSearchDelegate(index),
-    );
-
-    if (result != null) {
-      setState(() {
-        if (index == 0) {
-          start = result;
-        } else if (index == 1) {
-          destination = result;
-        }
-      });
-    }
   }
 }
 
