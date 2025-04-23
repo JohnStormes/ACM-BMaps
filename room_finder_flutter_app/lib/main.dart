@@ -11,10 +11,12 @@ class MyApp extends StatelessWidget {
   const MyApp({
     super.key,
     required this.graph,
+    required this.floorPlansPNGs
   });
 
   // passed in from main when app is started
   final Graph graph;
+  final List<String> floorPlansPNGs;
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +29,7 @@ class MyApp extends StatelessWidget {
       home: MyHomePage(
         title: "BMaps",
         graph: graph,
+        floorPlansPNGs: floorPlansPNGs
       ),
     );
   }
@@ -34,36 +37,36 @@ class MyApp extends StatelessWidget {
 
 // widget created in MyApp, which creates the _MyHomePageState custom state
 class MyHomePage extends StatefulWidget {
-  MyHomePage({super.key, required this.title, required this.graph});
+  MyHomePage({super.key, required this.title, required this.graph, required this.floorPlansPNGs});
 
   final String title;
   // passed in from MyApp when homepage is created
   final Graph graph;
+  final List<String> floorPlansPNGs;
 
-  @override _MyHomePageState createState() => _MyHomePageState(graph);
+  @override _MyHomePageState createState() => _MyHomePageState(graph, floorPlansPNGs);
 }
 
 // PRIMARY HOME PAGE CLASS
 // contains most home page widgets and functionality
 class _MyHomePageState extends State<MyHomePage> {
   // these strings change as rooms are selected
-  String start = "Start";
+  String start = "Start"; 
   String destination = "Destination";
   // curren graph
   Graph graph = Graph();
+  List<String> floorPlansPNGs = [];
+
+  String _dropDownValue = "Floor 6";
+  int _floorValue = 6;
+  final List<String> _dropDownItems = ["Floor 6", "Floor 7"];
+
   // list of values for the current path
   List<({int x, int y})> path_list = [];
 
-  _MyHomePageState(Graph a_graph) {
+  _MyHomePageState(Graph a_graph, List<String> a_floorPlansPNGs) {
     graph = a_graph;
-  }
-
-  // initializes the path, ran every time a new room is chosen
-  Future<void> _loadInitialPath() async {
-    final list = await loadPath(graph, start, destination);
-    setState(() {
-      path_list = list;
-    });
+    floorPlansPNGs = a_floorPlansPNGs;
   }
 
   // opens a search menu, gets result, and updates the start and destination string variables
@@ -82,7 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
           destination = result;
         }
       });
-      final list = await loadPath(graph, start, destination);
+      final list = await loadPath(graph, start, destination, _floorValue);
       // reload home page
       setState(() {
         path_list = list;
@@ -119,7 +122,8 @@ class _MyHomePageState extends State<MyHomePage> {
               maxScale: 7,
               scaleFactor: 1,
               // creates the image widget from the Draw.dart file
-              child: ImageWithLines.new(path_list: path_list)
+              // CHANGE THE -6 ONCE DONE TESTING*****************************************************************
+              child: ImageWithLines.new(path_list: path_list, image: floorPlansPNGs[_floorValue - 6])
             ),
           ),
 
@@ -178,6 +182,55 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: BING_GREEN
+                ),
+              ),
+            ),
+          ),
+
+          // drop down menu
+          Positioned(
+            bottom: 80,
+            left: 20,
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width - 40,
+              height: 50,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: BING_GREEN,
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    isExpanded: true, // ensures full width
+                    icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
+                    borderRadius: BorderRadius.circular(25),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                    ),
+                    dropdownColor: BING_GREEN,
+                    items: _dropDownItems.map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    value: _dropDownValue,
+                    onChanged: (String? newValue) async {
+                      setState(() {
+                        _dropDownValue = newValue!;
+                        _floorValue = int.parse(_dropDownValue.split(' ')[1]);
+                      });
+
+                      if (start != "Start" && destination != "Destination") {
+                        final list = await loadPath(graph, start, destination, _floorValue);
+                        setState(() {
+                          path_list = list;
+                        });
+                      }
+                    },
+                  ),
                 ),
               ),
             ),
@@ -274,17 +327,21 @@ class CustomSearchDelegate extends SearchDelegate {
 }
 
 // loads a graph from a file and passes it back to the caller
-Future<Graph> loadGraph(Graph graph, String file_path) async {
+Future<Graph> loadGraph(Graph graph, List<String> filePaths) async {
   // load a JSON file
-  await graph.readJSON(file_path);
+  await graph.readJSON(filePaths);
   return graph;
 }
 
-Future<List<({int x, int y})>> loadPath(Graph graph, String start_room, String end_room) async {
+Future<List<({int x, int y})>> loadPath(Graph graph, String start_room, String end_room, int floor) async {
   List<({int x, int y})> new_path_list = [];
   Map<Node, int> path = Map();
   // if either or one of the rooms isn't set, handle it for the canvas drawer
-  if (start_room == "Start" && end_room == "Destination") {
+  int end_room_floor = graph.getNodeWithRoom(end_room).getFloorAndIndex().floor;
+  int start_room_floor = graph.getNodeWithRoom(start_room).getFloorAndIndex().floor;
+  if ((start_room == "Start" && end_room == "Destination") 
+      || (start_room == "Start" && end_room_floor != floor) 
+      || (end_room == "Destination" && start_room_floor != floor)) {
     return new_path_list;
   } else if (start_room == "Start") {
     new_path_list.add((x : graph.getNodeWithRoom(end_room).getXPos(), y : graph.getNodeWithRoom(end_room).getYPos()));
@@ -301,7 +358,9 @@ Future<List<({int x, int y})>> loadPath(Graph graph, String start_room, String e
 
   // save the nodes in the path as a list of x and y coordinates
   for (var entry in indexed_list) {
-    new_path_list.add((x : entry.key.getXPos(), y : entry.key.getYPos()));
+    if (entry.key.getFloorAndIndex().floor == floor) {
+      new_path_list.add((x : entry.key.getXPos(), y : entry.key.getYPos()));
+    }
   }
   return new_path_list;
 }
@@ -313,11 +372,18 @@ void main() async {
   // NATIVE GRAPH INSTANCE
   Graph core_graph = Graph();
 
-  // floorplan files
-  String floor6 = "assets/data/library_tower_floor_6_data.json";
+  // floorplan json files
+  String floor6JSON = "assets/data/library_tower_floor_6_data.json";
+  String floor7JSON = "assets/data/library_tower_floor_7_data.json";
+  List<String> floorPlansJSONs = [floor6JSON, floor7JSON];
+
+  // floorplan image files
+  String floor6PNG = "assets/images/library_tower_floor_6.png";
+  String floor7PNG = "assets/images/library_tower_floor_7.png";
+  List<String> floorPlansPNGs = [floor6PNG, floor7PNG];
 
   // ensure the core_graph is initialized before starting the app!
   WidgetsFlutterBinding.ensureInitialized();
-  core_graph = await loadGraph(core_graph, floor6);
-  runApp(MyApp(graph: core_graph));
+  core_graph = await loadGraph(core_graph, floorPlansJSONs);
+  runApp(MyApp(graph: core_graph, floorPlansPNGs: floorPlansPNGs));
 }
