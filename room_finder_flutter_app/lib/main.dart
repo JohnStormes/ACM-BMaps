@@ -122,8 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
               maxScale: 7,
               scaleFactor: 1,
               // creates the image widget from the Draw.dart file
-              // CHANGE THE -6 ONCE DONE TESTING*****************************************************************
-              child: ImageWithLines.new(path_list: path_list, image: floorPlansPNGs[_floorValue - 6])
+              child: ImageWithLines.new(path_list: path_list, image: floorPlansPNGs[_floorValue])
             ),
           ),
 
@@ -380,7 +379,7 @@ void main() async {
   // floorplan image files
   String floor6PNG = "assets/images/library_tower_floor_6.png";
   String floor7PNG = "assets/images/library_tower_floor_7.png";
-  List<String> floorPlansPNGs = [floor6PNG, floor7PNG];
+  List<String> floorPlansPNGs = ["", "", "", "", "", "", floor6PNG, floor7PNG];
 
   // ensure the core_graph is initialized before starting the app!
   WidgetsFlutterBinding.ensureInitialized();
