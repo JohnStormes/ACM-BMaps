@@ -8,7 +8,7 @@ class Building{
 
   Building(List<String> floor_plan_files) {
     for (int i = 0; i < floor_plan_files.length; i++) {
-      _master_graph.readJSON(floor_plan_files[i]);
+      //_master_graph.readJSON(floor_plan_files[i]);
     }
   }
 
