@@ -203,13 +203,13 @@
             "xPos": 308,
             "yPos": 272,
             "rooms": "STR11",
-            "connections": "6-11, 7-33"
+            "connections": "6-11, 7-34"
         },
         "6-34": {
             "xPos": 349,
             "yPos": 396,
             "rooms": "STR11",
-            "connections": "6-16, 7-34"
+            "connections": "6-16, 7-33"
         },
         "6-35": {
             "xPos": 465,
