@@ -102,7 +102,7 @@ class _MyHomePageState extends State<MyHomePage> {
             fontWeight: FontWeight.w700,
             color: Colors.white,
           ),
-          textAlign: TextAlign.center,
+          textAlign: TextAlign.left,
         ),
         backgroundColor: BING_GREEN,
         centerTitle: true,
@@ -282,6 +282,7 @@ Future<Graph> loadGraph(Graph graph, String file_path) async {
 
 Future<List<({int x, int y})>> loadPath(Graph graph, String start_room, String end_room) async {
   List<({int x, int y})> new_path_list = [];
+  Map<Node, int> path = Map();
   // if either or one of the rooms isn't set, handle it for the canvas drawer
   if (start_room == "Start" && end_room == "Destination") {
     return new_path_list;
@@ -313,7 +314,7 @@ void main() async {
   Graph core_graph = Graph();
 
   // floorplan files
-  String floor6 = "assets/data/library_tower_floor_6.json";
+  String floor6 = "assets/data/library_tower_floor_6_data.json";
 
   // ensure the core_graph is initialized before starting the app!
   WidgetsFlutterBinding.ensureInitialized();
