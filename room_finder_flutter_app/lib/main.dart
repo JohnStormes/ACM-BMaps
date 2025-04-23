@@ -47,10 +47,14 @@ class MyHomePage extends StatefulWidget {
 // contains most home page widgets and functionality
 class _MyHomePageState extends State<MyHomePage> {
   // these strings change as rooms are selected
-  String start = "Start";
+  String start = "Start"; 
   String destination = "Destination";
   // curren graph
   Graph graph = Graph();
+
+  String _dropDownValue = "Floor 1";
+  final List<String> _dropDownItems = ["Floor 1", "Floor 2"];
+
   // list of values for the current path
   List<({int x, int y})> path_list = [];
 
@@ -182,6 +186,45 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
           ),
+
+          // drop down menu
+          Positioned(
+            bottom: 80,
+            left: 20,
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width - 40,
+              height: 35,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: BING_GREEN,
+                  borderRadius: BorderRadius.circular(25)
+                ),
+                child: DropdownButton<String>(
+                  underline: SizedBox(),
+                  iconEnabledColor: Colors.white,
+                  borderRadius: BorderRadius.circular(25),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20
+                  ),
+                  dropdownColor: BING_GREEN,
+                  items: _dropDownItems.map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value)  
+                    );
+                  }).toList(),
+                  value: _dropDownValue,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _dropDownValue = newValue!;
+                    });
+                  }
+                  )
+              )
+            )
+          )
         ],
       ),
     );
