@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'src/backend/graph.dart';
 import 'src/backend/node.dart';
 
-// GLOBAL VARS
-Map<Node, int> path = Map();
-
 // This class is a widget containing the floor plan image,
 // and the linepainter on top of the image.
 // This class takes path_list as an argument, which is used to draw the path

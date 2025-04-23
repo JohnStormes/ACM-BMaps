@@ -1,0 +1,299 @@
+{
+    "floor": 6,
+    "nodes": {
+        "6-0": {
+            "xPos": 216,
+            "yPos": 129,
+            "rooms": "T608",
+            "connections": "6-1"
+        },
+        "6-1": {
+            "xPos": 216,
+            "yPos": 204,
+            "rooms": "EMPTY",
+            "connections": "6-11,6-0,6-2"
+        },
+        "6-2": {
+            "xPos": 216,
+            "yPos": 232,
+            "rooms": "EMPTY",
+            "connections": "6-3,6-26,6-1"
+        },
+        "6-3": {
+            "xPos": 216,
+            "yPos": 272,
+            "rooms": "EMPTY",
+            "connections": "6-4,6-47,6-2,6-28"
+        },
+        "6-4": {
+            "xPos": 216,
+            "yPos": 362,
+            "rooms": "EMPTY",
+            "connections": "6-45,6-3,6-46"
+        },
+        "6-5": {
+            "xPos": 216,
+            "yPos": 381,
+            "rooms": "EMPTY",
+            "connections": "6-31"
+        },
+        "6-6": {
+            "xPos": 216,
+            "yPos": 423,
+            "rooms": "EMPTY",
+            "connections": "6-44,6-32,6-45"
+        },
+        "6-7": {
+            "xPos": 216,
+            "yPos": 533,
+            "rooms": "EMPTY",
+            "connections": "6-44,6-39,6-8"
+        },
+        "6-8": {
+            "xPos": 216,
+            "yPos": 573,
+            "rooms": "EMPTY",
+            "connections": "6-7,6-40,6-9"
+        },
+        "6-9": {
+            "xPos": 216,
+            "yPos": 635,
+            "rooms": "T617",
+            "connections": "6-8"
+        },
+        "6-10": {
+            "xPos": 392,
+            "yPos": 124,
+            "rooms": "T609",
+            "connections": "6-12"
+        },
+        "6-11": {
+            "xPos": 308,
+            "yPos": 205,
+            "rooms": "EMPTY",
+            "connections": "6-1,6-12,6-33"
+        },
+        "6-12": {
+            "xPos": 392,
+            "yPos": 206,
+            "rooms": "EMPTY",
+            "connections": "6-11,6-10,6-13"
+        },
+        "6-13": {
+            "xPos": 392,
+            "yPos": 233,
+            "rooms": "EMPTY",
+            "connections": "6-12,6-25,6-14"
+        },
+        "6-14": {
+            "xPos": 392,
+            "yPos": 271,
+            "rooms": "EMPTY",
+            "connections": "6-27,6-13,6-15"
+        },
+        "6-15": {
+            "xPos": 392,
+            "yPos": 381,
+            "rooms": "EMPTY",
+            "connections": "6-14,6-16,6-29"
+        },
+        "6-16": {
+            "xPos": 392,
+            "yPos": 395,
+            "rooms": "EMPTY",
+            "connections": "6-15,6-17,6-34"
+        },
+        "6-17": {
+            "xPos": 392,
+            "yPos": 419,
+            "rooms": "EMPTY",
+            "connections": "6-16,6-30,6-18"
+        },
+        "6-18": {
+            "xPos": 392,
+            "yPos": 501,
+            "rooms": "EMPTY",
+            "connections": "6-17,6-19,6-21"
+        },
+        "6-19": {
+            "xPos": 392,
+            "yPos": 532,
+            "rooms": "EMPTY",
+            "connections": "6-18,6-35,6-20"
+        },
+        "6-20": {
+            "xPos": 392,
+            "yPos": 572,
+            "rooms": "EMPTY",
+            "connections": "6-19,6-36,6-37"
+        },
+        "6-21": {
+            "xPos": 362,
+            "yPos": 500,
+            "rooms": "EMPTY",
+            "connections": "6-18,6-22,6-38"
+        },
+        "6-22": {
+            "xPos": 338,
+            "yPos": 500,
+            "rooms": "EMPTY",
+            "connections": "6-21,6-43,6-23"
+        },
+        "6-23": {
+            "xPos": 273,
+            "yPos": 500,
+            "rooms": "EMPTY",
+            "connections": "6-22,6-42,6-24"
+        },
+        "6-24": {
+            "xPos": 242,
+            "yPos": 500,
+            "rooms": "EMPTY",
+            "connections": "6-23,6-44,6-41"
+        },
+        "6-25": {
+            "xPos": 466,
+            "yPos": 234,
+            "rooms": "T610",
+            "connections": "6-13"
+        },
+        "6-26": {
+            "xPos": 147,
+            "yPos": 234,
+            "rooms": "T607",
+            "connections": "6-2"
+        },
+        "6-27": {
+            "xPos": 470,
+            "yPos": 272,
+            "rooms": "T611",
+            "connections": "6-14"
+        },
+        "6-28": {
+            "xPos": 149,
+            "yPos": 272,
+            "rooms": "T606",
+            "connections": "6-3"
+        },
+        "6-29": {
+            "xPos": 462,
+            "yPos": 382,
+            "rooms": "T612",
+            "connections": "6-15"
+        },
+        "6-30": {
+            "xPos": 462,
+            "yPos": 420,
+            "rooms": "T613",
+            "connections": "6-17"
+        },
+        "6-31": {
+            "xPos": 147,
+            "yPos": 382,
+            "rooms": "T605",
+            "connections": "6-5"
+        },
+        "6-32": {
+            "xPos": 148,
+            "yPos": 420,
+            "rooms": "T604",
+            "connections": "6-6"
+        },
+        "6-33": {
+            "xPos": 308,
+            "yPos": 272,
+            "rooms": "STR11",
+            "connections": "6-11"
+        },
+        "6-34": {
+            "xPos": 349,
+            "yPos": 396,
+            "rooms": "STR11",
+            "connections": "6-16"
+        },
+        "6-35": {
+            "xPos": 465,
+            "yPos": 533,
+            "rooms": "T614",
+            "connections": "6-19"
+        },
+        "6-36": {
+            "xPos": 466,
+            "yPos": 574,
+            "rooms": "T615",
+            "connections": "6-20"
+        },
+        "6-37": {
+            "xPos": 392,
+            "yPos": 633,
+            "rooms": "T616",
+            "connections": "6-20"
+        },
+        "6-38": {
+            "xPos": 362,
+            "yPos": 555,
+            "rooms": "T601A",
+            "connections": "6-21"
+        },
+        "6-39": {
+            "xPos": 151,
+            "yPos": 533,
+            "rooms": "T602",
+            "connections": "6-7"
+        },
+        "6-40": {
+            "xPos": 158,
+            "yPos": 574,
+            "rooms": "T602",
+            "connections": "6-8"
+        },
+        "6-41": {
+            "xPos": 242,
+            "yPos": 556,
+            "rooms": "T601B",
+            "connections": "6-24"
+        },
+        "6-42": {
+            "xPos": 273,
+            "yPos": 450,
+            "rooms": "ELEV24",
+            "connections": "6-23"
+        },
+        "6-43": {
+            "xPos": 339,
+            "yPos": 453,
+            "rooms": "ELEV25",
+            "connections": "6-22"
+        },
+        "6-44": {
+            "xPos": 215,
+            "yPos": 500,
+            "rooms": "EMPTY",
+            "connections": "6-24,6-7,6-6"
+        },
+        "6-45": {
+            "xPos": 216,
+            "yPos": 382,
+            "rooms": "EMPTY",
+            "connections": "6-6,6-4"
+        },
+        "6-46": {
+            "xPos": 266,
+            "yPos": 362,
+            "rooms": "T618",
+            "connections": "6-4"
+        },
+        "6-47": {
+            "xPos": 260,
+            "yPos": 273,
+            "rooms": "T619",
+            "connections": "6-3,6-48"
+        },
+        "6-48": {
+            "xPos": 260,
+            "yPos": 239,
+            "rooms": "T620",
+            "connections": "6-47"
+        }
+    }
+}
