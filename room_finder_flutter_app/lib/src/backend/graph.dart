@@ -10,12 +10,7 @@ import 'dart:math';
 
 class Graph {
   Map<({int floor, int index}), Node> _nodes = {};
-  Map<Node, int> distances = {};
   Set<String> rooms_list = {};
-  int _nodes_length = 0;
-
-  //this is a change
-
   Graph();
 
   // reads from JSON file
@@ -30,34 +25,37 @@ class Graph {
       }
     }
   */
-  Future<void> readJSON(String file_path) async {
-    String input = await rootBundle.loadString(file_path);
-    var file = jsonDecode(input);
-    final int floor = file["floor"];
-    var map = file["nodes"];
-    _nodes_length = map.length;
+  Future<void> readJSON(List<String> filePaths) async {
+    for (String file_path in filePaths) {
+      String input = await rootBundle.loadString(file_path);
+      var file = jsonDecode(input);
+      final int floor = file["floor"];
+      Map map = file["nodes"];
 
 
-    // create nodes from JSON file
-    for (int i = 0; i < map.length; i++) {
-      String node_key = floor.toString() + "-" + i.toString();
-      var node = map[node_key];
-      int xPos = node["xPos"];
-      int yPos = node["yPos"];
-      String rooms = node["rooms"];
-      String connections = node["connections"];
-      Node new_node = new Node(floor, i, xPos, yPos, rooms, connections);
-      _nodes[(floor : floor, index : i)] = new_node;
-      distances[new_node] = 1000000;
-      for (String room in new_node.getRooms()) {
-        if (!rooms_list.contains(room)) {
-          rooms_list.add(room);
+      // create nodes from JSON file
+      for (int i = 0; i < map.length; i++) {
+        String node_key = floor.toString() + "-" + i.toString();
+        var node = map[node_key];
+        int xPos = node["xPos"];
+        int yPos = node["yPos"];
+        String rooms = node["rooms"];
+        String connections = node["connections"];
+        Node new_node = new Node(floor, i, xPos, yPos, rooms, connections);
+        _nodes[(floor : floor, index : i)] = new_node;
+        for (String room in new_node.getRooms()) {
+          if (!rooms_list.contains(room)) {
+            rooms_list.add(room);
+          }
         }
       }
     }
   }
 
   int getDist(Node n1, Node n2){
+    if (n1.getFloorAndIndex().floor != n2.getFloorAndIndex().floor) {
+      return 0;
+    }
     return (sqrt(pow(n1.getXPos() - n2.getXPos(), 2) + pow(n1.getYPos() - n2.getYPos(), 2))).toInt();
   }
 
@@ -139,10 +137,6 @@ class Graph {
 
   Node? getNode(int floor, int index) {
     return _nodes[(floor : floor, index : index)];
-  }
-
-  int getNodesLength() {
-    return _nodes_length;
   }
 
   List<String> getRoomsList() {

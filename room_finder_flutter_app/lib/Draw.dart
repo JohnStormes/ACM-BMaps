@@ -7,15 +7,16 @@ import 'src/backend/node.dart';
 // This class takes path_list as an argument, which is used to draw the path
 class ImageWithLines extends StatelessWidget {
   final List<({int x, int y})> path_list;
+  String image;
 
-  ImageWithLines({super.key, required this.path_list});
+  ImageWithLines({super.key, required this.path_list, required this.image});
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         Image.asset(
-          'assets/images/library_tower_floor_6.png',
+          image,
           fit: BoxFit.cover,
         ),
         Positioned.fill(
