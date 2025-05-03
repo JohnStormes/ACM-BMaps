@@ -26,7 +26,7 @@ class Node
     _position = (x : xPos, y : yPos);
 
     // check if the node is connected to any rooms, and if so, initialize rooms list
-    if (rooms != "EMPTY") {
+    if (rooms != "") {
       _rooms = rooms.split(',').toSet();
       _hasRooms = true;
     } 

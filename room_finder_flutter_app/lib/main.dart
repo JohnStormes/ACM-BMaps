@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
 
 // widget created in MyApp, which creates the _MyHomePageState custom state
 class MyHomePage extends StatefulWidget {
-  MyHomePage({super.key, required this.title, required this.graph, required this.floorPlansPNGs});
+  const MyHomePage({super.key, required this.title, required this.graph, required this.floorPlansPNGs});
 
   final String title;
   // passed in from MyApp when homepage is created
@@ -53,13 +53,14 @@ class _MyHomePageState extends State<MyHomePage> {
   // these strings change as rooms are selected
   String start = "Start"; 
   String destination = "Destination";
+  String building = "Building";
   // curren graph
   Graph graph = Graph();
   List<String> floorPlansPNGs = [];
 
   String _dropDownValue = "Floor 6";
   int _floorValue = 6;
-  final List<String> _dropDownItems = ["Floor 6", "Floor 7"];
+  final List<String> _dropDownItems = ["Floor 6", "Floor 7", "Floor 8"];
 
   // list of values for the current path
   List<({int x, int y})> path_list = [];
@@ -77,7 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
       delegate: CustomSearchDelegate(index, graph),
     );
 
-    if (result != null) {
+    if (result != null && (index == 0 || index == 1)) {
       setState(() {
         if (index == 0) {
           start = result;
@@ -90,6 +91,11 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {
         path_list = list;
       });
+    } else if (result != null && (index == 2)) {
+      setState(() {
+        building = result;
+      });
+      // make the list with the current building's graph
     }
   }
 
@@ -105,10 +111,31 @@ class _MyHomePageState extends State<MyHomePage> {
             fontWeight: FontWeight.w700,
             color: Colors.white,
           ),
-          textAlign: TextAlign.left,
+          textAlign: TextAlign.center,
         ),
+        leading: Image.asset('assets/images/Bing-logo.png'),
         backgroundColor: BING_GREEN,
-        centerTitle: true,
+        actions: [
+          ElevatedButton.icon(
+            // right search button activates the code below onPressed here
+            onPressed: () {
+              _openSearch(1);
+            },
+            label: Text(
+              destination,
+              style: const TextStyle(
+                color: Colors.white,
+              ),
+            ),
+            icon: const Icon(
+              Icons.search, 
+              color: Colors.white
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: BING_GREEN
+            ),
+          ),
+        ]
       ),
       backgroundColor: Colors.white,
       body: Stack(
@@ -374,12 +401,14 @@ void main() async {
   // floorplan json files
   String floor6JSON = "assets/data/library_tower_floor_6_data.json";
   String floor7JSON = "assets/data/library_tower_floor_7_data.json";
-  List<String> floorPlansJSONs = [floor6JSON, floor7JSON];
+  String floor8JSON = "assets/data/library_tower_floor_8_data.json";
+  List<String> floorPlansJSONs = [floor6JSON, floor7JSON, floor8JSON];
 
   // floorplan image files
   String floor6PNG = "assets/images/library_tower_floor_6.png";
   String floor7PNG = "assets/images/library_tower_floor_7.png";
-  List<String> floorPlansPNGs = ["", "", "", "", "", "", floor6PNG, floor7PNG];
+  String floor8PNG = "assets/images/library_tower_floor_8.png";
+  List<String> floorPlansPNGs = ["", "", "", "", "", "", floor6PNG, floor7PNG, floor8PNG];
 
   // ensure the core_graph is initialized before starting the app!
   WidgetsFlutterBinding.ensureInitialized();
