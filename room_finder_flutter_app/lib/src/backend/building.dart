@@ -4,44 +4,50 @@ import 'node.dart';
 import 'dart:math';
 
 class Building{
-  Graph _master_graph = new Graph();
+  String _title = "";
+  Graph _graph = new Graph();
+  int _defaultFloor = 0;
+  List<String> _floorNames = [];
+  List<String> _floorPlanJSONs = [];
+  List<String> _floorPlanImages = [];
 
-  Building(List<String> floor_plan_files) {
-    for (int i = 0; i < floor_plan_files.length; i++) {
-      //_master_graph.readJSON(floor_plan_files[i]);
-    }
+  Building(String aTitle, int aDefaultFloor) {
+    _title = aTitle;
+    _defaultFloor = aDefaultFloor;
   }
 
-  /*
-  int getDist(Node n1, Node n2){
-    return (sqrt(pow(n1.getXPos() - n2.getXPos(), 2) + pow(n1.getYPos() - n2.getYPos(), 2))).toInt();
+  // loads a graph from a file and passes it back to the caller
+  Future<Graph> loadGraph(List<String> filePaths) async {
+    // load a JSON file
+    Graph graph = new Graph();
+    await graph.readJSON(filePaths);
+    _graph = graph;
+    return graph;
   }
 
-  Map<Node, int> pathFinder(Graph graph, Node ?source){
-    Set<Node> visited = {};
-    if (source == null) {
-      return distances;
-    }
-    distances[source] = 0;
-
-    final pq = PriorityQueue<Node>((a, b) => distances[a]! - distances[b]!);
-    pq.add(source);
-    while(pq.isNotEmpty){
-      Node current = pq.removeFirst();
-      if(!visited.contains(current)){
-        visited.add(current);
-        for(({int floor, int index}) neighbor_key in current.getAdjacentNodes()){
-          Node? neighbor = getNode(neighbor_key.floor, neighbor_key.index);
-          if (neighbor == null) continue;
-          int distance = distances[current]! + graph.getDist(current, neighbor);
-          if(distances[neighbor]! > distance){
-            distances[neighbor] = distance;
-            pq.add(neighbor);
-          }
-        }
-      }
-    }
-    return distances;
+  // add floors in order for proper display and usage
+  void addFloor(String floorName, String floorPlanJSON, String floorPlanImage) {
+    _floorNames.add(floorName);
+    _floorPlanJSONs.add(floorPlanJSON);
+    _floorPlanImages.add(floorPlanImage);
   }
-  */
+
+  String getTitle() {
+    return _title;
+  }
+  Graph getGraph() {
+    return _graph;
+  }
+  List<String> getJSONs() {
+    return _floorPlanJSONs;
+  }
+  List<String> getImages() {
+    return _floorPlanImages;
+  }
+  List<String> getFloorNames() {
+    return _floorNames;
+  }
+  int getDefaultFloor() {
+    return _defaultFloor;
+  }
 }
