@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:collection/collection.dart';
 import 'dart:math';
 
+enum Direction { nd, up, down }
 
 class Graph {
   Map<({int floor, int index}), Node> _nodes = {};

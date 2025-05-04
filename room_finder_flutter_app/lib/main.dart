@@ -77,7 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<String> _dropDownItems = [];
 
   // list of values for the current path
-  List<({int x, int y})> path_list = [];
+  List<({int x, int y, Direction d})> path_list = [];
 
   // pass in aCurrentBuilding and aCurrentFloor when initializing app
   _MyHomePageState(List<Building> aBuildings, int aCurrentBuilding, int aCurrentFloor) {
@@ -398,8 +398,8 @@ class CustomSearchDelegate extends SearchDelegate {
   }
 }
 
-Future<List<({int x, int y})>> loadPath(Graph graph, String start_room, String end_room, int floor) async {
-  List<({int x, int y})> new_path_list = [];
+Future<List<({int x, int y, Direction d})>> loadPath(Graph graph, String start_room, String end_room, int floor) async {
+  List<({int x, int y, Direction d})> new_path_list = [];
   Map<Node, int> path = Map();
   // if either or one of the rooms isn't set, handle it for the canvas drawer
   int end_room_floor = graph.getNodeWithRoom(end_room).getFloorAndIndex().floor;
@@ -409,10 +409,14 @@ Future<List<({int x, int y})>> loadPath(Graph graph, String start_room, String e
       || (end_room == "Destination" && start_room_floor != floor)) {
     return new_path_list;
   } else if (start_room == "Start") {
-    new_path_list.add((x : graph.getNodeWithRoom(end_room).getXPos(), y : graph.getNodeWithRoom(end_room).getYPos()));
+    Node n = graph.getNodeWithRoom(end_room);
+
+    new_path_list.add((x : n.getXPos(), y : n.getYPos(), d : Direction.nd));
     return new_path_list;
   } else if (end_room == "Destination") {
-    new_path_list.add((x : graph.getNodeWithRoom(start_room).getXPos(), y : graph.getNodeWithRoom(start_room).getYPos()));
+    Node n = graph.getNodeWithRoom(start_room);
+
+    new_path_list.add((x : n.getXPos(), y : n.getYPos(), d : Direction.nd));
     return new_path_list;
   }
 
@@ -422,11 +426,34 @@ Future<List<({int x, int y})>> loadPath(Graph graph, String start_room, String e
   var indexed_list = path.entries.toList();
 
   // save the nodes in the path as a list of x and y coordinates
-  for (var entry in indexed_list) {
-    if (entry.key.getFloorAndIndex().floor == floor) {
-      new_path_list.add((x : entry.key.getXPos(), y : entry.key.getYPos()));
+  for (int i = 0; i < indexed_list.length; i++) {
+    Node n = indexed_list[i].key;
+
+    if (n.getFloorAndIndex().floor == floor) {
+      bool changeInFloor = false;
+
+      for(String s in n.getRooms()) {
+        if(s.substring(0, 3) == "STR" || s.substring(0, 4) == "ELEV") {
+          changeInFloor = true;
+          break;
+        }
+      }
+
+      // if the node is a stair and it is not the last element of the path, set the direction
+      if(changeInFloor && i + 1 < indexed_list.length) {
+        Node next = indexed_list[i + 1].key;
+
+        Direction d = n.getFloorAndIndex().floor < next.getFloorAndIndex().floor ? Direction.up : Direction.down;
+
+        new_path_list.add((x : n.getXPos(), y : n.getYPos(), d : d));
+      }
+      // if the node is not a stair or is a stair at the end of the path, unset the direction
+      else {
+        new_path_list.add((x : n.getXPos(), y : n.getYPos(), d : Direction.nd));
+      }
     }
   }
+
   return new_path_list;
 }
 
