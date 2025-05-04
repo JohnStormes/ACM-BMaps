@@ -6,7 +6,7 @@ import 'src/backend/node.dart';
 // and the linepainter on top of the image.
 // This class takes path_list as an argument, which is used to draw the path
 class ImageWithLines extends StatelessWidget {
-  final List<({int x, int y})> path_list;
+  final List<({int x, int y, Direction d})> path_list;
   String image;
 
   ImageWithLines({super.key, required this.path_list, required this.image});
@@ -39,9 +39,38 @@ class LinePainter extends CustomPainter {
   final double RADIUS = 5;
 
   // list of node locations in the path
-  final List<({int x, int y})> path_list;
+  final List<({int x, int y, Direction d})> path_list;
 
   LinePainter(this.path_list);
+
+  Path _getArrowPath(Direction d, double x, double y, double r) {
+    Path res = Path();
+
+    res.moveTo(x, y - r); // top head center
+    res.lineTo(x + r, y); // bottom head right
+
+    res.lineTo(x + r / 2.0, y); // top shaft right
+    res.lineTo(x + r / 2.0, y + r); // bottom shaft right
+
+    res.lineTo(x - r / 2.0, y + r); // bottom shaft left
+    res.lineTo(x - r / 2.0, y); // top shaft left
+
+    res.lineTo(x - r, y); // botton head left
+
+    res.close();
+
+    // if direction is down, flip the arrow
+    if(d == Direction.down) {
+      Matrix4 transformation = Matrix4.identity()
+        ..translate(x, y)
+        ..scale(1.0, -1.0)
+        ..translate(-x, -y);
+
+      res = res.transform(transformation.storage);
+    }
+
+    return res;
+  }
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -59,15 +88,38 @@ class LinePainter extends CustomPainter {
       ..strokeWidth = 5
       ..strokeCap = StrokeCap.round;
 
-    // Guard clause: do nothing if empty, draw single green point if only 1 point
+    // guard clause: do nothing if empty, draw single green point if only 1 point
     if (path_list.isEmpty) return;
     if (path_list.length == 1) {
       final singlePoint = path_list[0];
-      canvas.drawCircle(
-        Offset(singlePoint.x.toDouble(), singlePoint.y.toDouble()),
-        RADIUS,
-        start_paint,
-      );
+
+      if(singlePoint.d == Direction.nd) {
+        canvas.drawCircle(
+          Offset(singlePoint.x.toDouble(), singlePoint.y.toDouble()),
+          RADIUS,
+          start_paint,
+        );
+      }
+      else {
+        Path p = Path();
+
+        double r = RADIUS * 2;
+
+        final Paint strokePaint = Paint()
+          ..color = Colors.black
+          ..strokeWidth = RADIUS * 0.125
+          ..style = PaintingStyle.stroke;
+
+        // up arrow
+        p = _getArrowPath(singlePoint.d, singlePoint.x.toDouble(), singlePoint.y.toDouble(), r);
+
+        // draw arrow
+        canvas.drawPath(p, end_paint);
+
+        // draw stroke
+        canvas.drawPath(p, strokePaint);
+      }
+
       return;
     }
 
@@ -87,11 +139,37 @@ class LinePainter extends CustomPainter {
       start_paint
     );
     // end circle
-    canvas.drawCircle(
-      Offset(path_list[path_list.length - 1].x.toDouble(), path_list[path_list.length - 1].y.toDouble()),
-      RADIUS, 
-      end_paint
-    );
+    var end = path_list[path_list.length - 1];
+
+    double ex = end.x.toDouble();
+    double ey = end.y.toDouble();
+
+    if(end.d == Direction.nd) {
+      canvas.drawCircle(
+        Offset(ex, ey),
+        RADIUS, 
+        end_paint
+      );
+    }
+    else { 
+      Path p = Path();
+
+      double r = RADIUS * 2;
+
+      final Paint strokePaint = Paint()
+        ..color = Colors.black
+        ..strokeWidth = RADIUS * 0.125
+        ..style = PaintingStyle.stroke;
+
+      // up arrow
+      p = _getArrowPath(end.d, ex, ey, r);
+
+      // draw arrow
+      canvas.drawPath(p, end_paint);
+
+      // draw stroke
+      canvas.drawPath(p, strokePaint);
+    }
   }
 
   @override
