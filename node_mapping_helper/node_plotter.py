@@ -34,6 +34,8 @@ class ImageViewer:
         self.click_start_x = 0
         self.click_start_y = 0
 
+        self.hide_instructions = False
+
 
     def screen_to_image_coords(self, x, y):
         x = (x - self.offset_x) / self.zoom
@@ -56,7 +58,7 @@ class ImageViewer:
                 closest_idx = idx
         return closest_idx
 
-    def find_closest_guideline(self, x, y, threshold=25):
+    def find_closest_guideline(self, x, y, threshold=15):
         closest_dist = float('inf')
         g_type = None
         closest_idx = -1
@@ -198,7 +200,7 @@ class ImageViewer:
                     orig_x, orig_y = self.screen_to_image_coords(x, y)
 
                     #check for nearest guideline and snap the point to it
-                    g_type, idx = self.find_closest_guideline(x, y, threshold=25)
+                    g_type, idx = self.find_closest_guideline(x, y, threshold=15)
                     if g_type == 'h':
                         orig_y = self.guidelines['h'][idx]
                     elif g_type == 'v':
@@ -295,7 +297,7 @@ class ImageViewer:
             if label: #this is user assigned name to each point
                 pass
             else:
-                label = "EMPTY"
+                label = ""
 
             nodes[node_id] = {
                 "xPos": int(x),
@@ -334,6 +336,7 @@ class ImageViewer:
 
             instructions = [
                 f"Mode: {mode}",
+                "H: Hide these Instructions",
                 "D: Pan Mode",
                 "G: Guideline Mode",
                 "P: Point Plotting Mode:",
@@ -355,44 +358,50 @@ class ImageViewer:
 
             ]
 
-            for i, text in enumerate(instructions):
-                y = 30 + i * 20
-                cv2.putText(display_image, text, (10, y),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
-                cv2.putText(display_image, text, (10, y),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1)
+            if not self.hide_instructions:
+                for i, text in enumerate(instructions):
+                    y = 30 + i * 20
+                    cv2.putText(display_image, text, (10, y),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+                    cv2.putText(display_image, text, (10, y),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1)
 
             cv2.imshow(self.window_name, display_image)
 
             key = cv2.waitKey(1) & 0xFF
             if key == 27:  #esc
                 break
-            elif key == ord('c'): #connecting points mode
+            elif key == ord('c') or  key == ord('C'): #connecting points mode
                 self.is_connecting = True
                 self.is_plotting = False
                 self.is_guideline_mode = False
                 self.selected_point = None
 
-            elif key == ord('e'): #export to json
+            elif key == ord('e') or  key == ord('E'): #export to json
                 self.export_points()
 
-            elif key == ord('p'): #point plotting mode
+
+            elif key == ord('p') or key == ord('P'): #point plotting mode
                 self.is_connecting = False
                 self.is_plotting = True
                 self.is_guideline_mode = False
                 self.selected_point = None
 
-            elif key == ord('g'): #guideline mode
+            elif key == ord('g') or key == ord('G'): #guideline mode
                 self.is_connecting = False
                 self.is_plotting = False
                 self.is_guideline_mode = True
                 self.selected_point = None
 
-            elif key == ord('d'): #panning mode
+            elif key == ord('d') or key == ord('D'): #panning mode
                 self.is_connecting = False
                 self.is_plotting = False
                 self.is_guideline_mode = False
                 self.selected_point = None
+
+            elif key == ord('h') or key == ord('H'):
+                self.hide_instructions = not self.hide_instructions
+
 
 
         cv2.destroyAllWindows()
