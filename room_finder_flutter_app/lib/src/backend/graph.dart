@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:collection/collection.dart';
 import 'dart:math';
 
+enum Direction { nd, up, down }
 
 class Graph {
   Map<({int floor, int index}), Node> _nodes = {};
@@ -27,6 +28,9 @@ class Graph {
   */
   Future<void> readJSON(List<String> filePaths) async {
     for (String file_path in filePaths) {
+      if (file_path == "") {
+        continue;
+      }
       String input = await rootBundle.loadString(file_path);
       var file = jsonDecode(input);
       final int floor = file["floor"];

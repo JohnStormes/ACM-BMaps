@@ -1,0 +1,86 @@
+{
+    "buildings": {
+        "library": {
+            "default floor": 6,
+            "floors": {
+                "floor 0": {
+                    "JSON": "",
+                    "PNG": ""
+                },
+                "floor 1": {
+                    "JSON": "",
+                    "PNG": ""
+                },
+                "floor 2": {
+                    "JSON": "",
+                    "PNG": ""
+                },
+                "floor 3": {
+                    "JSON": "",
+                    "PNG": ""
+                },
+                "floor 4": {
+                    "JSON": "",
+                    "PNG": ""
+                },
+                "floor 5": {
+                    "JSON": "",
+                    "PNG": ""
+                },
+                "floor 6": {
+                    "JSON": "assets/data/library_tower_floor_6_data.json",
+                    "PNG": "assets/images/library_tower_floor_6.png"
+                },
+                "floor 7": {
+                    "JSON": "assets/data/library_tower_floor_7_data.json",
+                    "PNG": "assets/images/library_tower_floor_7.png"
+                },
+                "floor 8": {
+                    "JSON": "assets/data/library_tower_floor_8_data.json",
+                    "PNG": "assets/images/library_tower_floor_8.png"
+                }
+            }
+        },
+        "library 2": {
+            "default floor": 8,
+            "floors": {
+                "floor 0": {
+                    "JSON": "",
+                    "PNG": ""
+                },
+                "floor 1": {
+                    "JSON": "",
+                    "PNG": ""
+                },
+                "floor 2": {
+                    "JSON": "",
+                    "PNG": ""
+                },
+                "floor 3": {
+                    "JSON": "",
+                    "PNG": ""
+                },
+                "floor 4": {
+                    "JSON": "",
+                    "PNG": ""
+                },
+                "floor 5": {
+                    "JSON": "",
+                    "PNG": ""
+                },
+                "floor 6": {
+                    "JSON": "assets/data/library_tower_floor_6_data.json",
+                    "PNG": "assets/images/library_tower_floor_6.png"
+                },
+                "floor 7": {
+                    "JSON": "assets/data/library_tower_floor_7_data.json",
+                    "PNG": "assets/images/library_tower_floor_7.png"
+                },
+                "floor 8": {
+                    "JSON": "assets/data/library_tower_floor_8_data.json",
+                    "PNG": "assets/images/library_tower_floor_8.png"
+                }
+            }
+        }
+    }
+}

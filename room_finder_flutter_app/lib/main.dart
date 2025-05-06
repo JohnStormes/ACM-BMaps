@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:room_finder_flutter_app/src/backend/node.dart';
 import 'Draw.dart';
+import 'src/backend/Building.dart';
 
 import 'src/backend/graph.dart';
 
@@ -8,15 +12,21 @@ const Color BING_GREEN =Color.fromRGBO(0, 93, 64, 1);
 
 /// The Widget that configures your application.
 class MyApp extends StatelessWidget {
-  const MyApp({
+  MyApp({
     super.key,
-    required this.graph,
-    required this.floorPlansPNGs
+    //required this.graph,
+    //required this.floorPlansPNGs
+    required this.buildings
   });
 
   // passed in from main when app is started
-  final Graph graph;
-  final List<String> floorPlansPNGs;
+  //final Graph graph;
+  //final List<String> floorPlansPNGs;
+  final List<Building> buildings;
+
+  // INITIALLY SELECTED BUILDING AND FLOOR
+  int currentBuilding = 0;
+  int currentFloor = 6;
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +38,9 @@ class MyApp extends StatelessWidget {
       ),
       home: MyHomePage(
         title: "BMaps",
-        graph: graph,
-        floorPlansPNGs: floorPlansPNGs
+        buildings: buildings,
+        currentBuilding: currentBuilding,
+        currentFloor: currentFloor
       ),
     );
   }
@@ -37,14 +48,15 @@ class MyApp extends StatelessWidget {
 
 // widget created in MyApp, which creates the _MyHomePageState custom state
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title, required this.graph, required this.floorPlansPNGs});
+  const MyHomePage({super.key, required this.title, required this.buildings, required this.currentBuilding, required this.currentFloor});
 
   final String title;
   // passed in from MyApp when homepage is created
-  final Graph graph;
-  final List<String> floorPlansPNGs;
+  final List<Building> buildings;
+  final int currentBuilding;
+  final int currentFloor;
 
-  @override _MyHomePageState createState() => _MyHomePageState(graph, floorPlansPNGs);
+  @override _MyHomePageState createState() => _MyHomePageState(buildings, currentBuilding, currentFloor);
 }
 
 // PRIMARY HOME PAGE CLASS
@@ -54,20 +66,29 @@ class _MyHomePageState extends State<MyHomePage> {
   String start = "Start"; 
   String destination = "Destination";
   String building = "Building";
-  // curren graph
+  // current building
+  List<Building> buildings = [];
+  int currentBuilding = 0;
   Graph graph = Graph();
   List<String> floorPlansPNGs = [];
 
-  String _dropDownValue = "Floor 6";
-  int _floorValue = 6;
-  final List<String> _dropDownItems = ["Floor 6", "Floor 7", "Floor 8"];
+  String _dropDownValue = "";
+  int _floorValue = 0;
+  List<String> _dropDownItems = [];
 
   // list of values for the current path
-  List<({int x, int y})> path_list = [];
+  List<({int x, int y, Direction d})> path_list = [];
 
-  _MyHomePageState(Graph a_graph, List<String> a_floorPlansPNGs) {
-    graph = a_graph;
-    floorPlansPNGs = a_floorPlansPNGs;
+  // pass in aCurrentBuilding and aCurrentFloor when initializing app
+  _MyHomePageState(List<Building> aBuildings, int aCurrentBuilding, int aCurrentFloor) {
+    buildings = aBuildings;
+    currentBuilding = aCurrentBuilding;
+    building = buildings[currentBuilding].getTitle();
+    graph = buildings[currentBuilding].getGraph();
+    floorPlansPNGs = buildings[currentBuilding].getImages();
+    _floorValue = aCurrentFloor;
+    _dropDownItems = buildings[currentBuilding].getFloorNames();
+    _dropDownValue = _dropDownItems[_floorValue];
   }
 
   // opens a search menu, gets result, and updates the start and destination string variables
@@ -75,7 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _openSearch(int index) async {
     final result = await showSearch(
       context: context,
-      delegate: CustomSearchDelegate(index, graph),
+      delegate: CustomSearchDelegate(index, graph, buildings),
     );
 
     if (result != null && (index == 0 || index == 1)) {
@@ -92,10 +113,27 @@ class _MyHomePageState extends State<MyHomePage> {
         path_list = list;
       });
     } else if (result != null && (index == 2)) {
-      setState(() {
-        building = result;
-      });
-      // make the list with the current building's graph
+      print(result);
+      if (building != result) {
+        setState(() {
+          building = result;
+          start = "Start";
+          destination = "Destination";
+        });
+        // make the list with the current building's graph
+        for (int i = 0; i < buildings.length; i++) {
+          if (buildings[i].getTitle() == result) {
+            currentBuilding = i;
+          }
+        }
+        _floorValue = buildings[currentBuilding].getDefaultFloor();
+        _dropDownValue = _dropDownItems[_floorValue];
+        final list = await loadPath(graph, start, destination, _floorValue);
+        // reload home page
+        setState(() {
+          path_list = list;
+        });
+      }
     }
   }
 
@@ -116,15 +154,17 @@ class _MyHomePageState extends State<MyHomePage> {
         leading: Image.asset('assets/images/Bing-logo.png'),
         backgroundColor: BING_GREEN,
         actions: [
+          
+          // building search button
           ElevatedButton.icon(
-            // right search button activates the code below onPressed here
             onPressed: () {
-              _openSearch(1);
+              _openSearch(2);
             },
             label: Text(
-              destination,
+              building,
               style: const TextStyle(
                 color: Colors.white,
+                fontSize: 20
               ),
             ),
             icon: const Icon(
@@ -275,10 +315,16 @@ class CustomSearchDelegate extends SearchDelegate {
 
   int button_index = 0;
   List<String> search_terms = [];
-  CustomSearchDelegate(int aButton_index, Graph a_graph) {
-    button_index = aButton_index;
-    graph = a_graph;
-    search_terms = graph.getRoomsList();
+  CustomSearchDelegate(int aButtonIndex, Graph aGraph, List<Building> aBuildings) {
+    button_index = aButtonIndex;
+    graph = aGraph;
+    if (button_index == 0 || button_index == 1) {
+      search_terms = graph.getRoomsList();
+    } else if (button_index == 2) {
+      for (int i = 0; i < aBuildings.length; i++) {
+        search_terms.add(aBuildings[i].getTitle());
+      }
+    }
   }
 
   @override
@@ -352,15 +398,8 @@ class CustomSearchDelegate extends SearchDelegate {
   }
 }
 
-// loads a graph from a file and passes it back to the caller
-Future<Graph> loadGraph(Graph graph, List<String> filePaths) async {
-  // load a JSON file
-  await graph.readJSON(filePaths);
-  return graph;
-}
-
-Future<List<({int x, int y})>> loadPath(Graph graph, String start_room, String end_room, int floor) async {
-  List<({int x, int y})> new_path_list = [];
+Future<List<({int x, int y, Direction d})>> loadPath(Graph graph, String start_room, String end_room, int floor) async {
+  List<({int x, int y, Direction d})> new_path_list = [];
   Map<Node, int> path = Map();
   // if either or one of the rooms isn't set, handle it for the canvas drawer
   int end_room_floor = graph.getNodeWithRoom(end_room).getFloorAndIndex().floor;
@@ -370,10 +409,14 @@ Future<List<({int x, int y})>> loadPath(Graph graph, String start_room, String e
       || (end_room == "Destination" && start_room_floor != floor)) {
     return new_path_list;
   } else if (start_room == "Start") {
-    new_path_list.add((x : graph.getNodeWithRoom(end_room).getXPos(), y : graph.getNodeWithRoom(end_room).getYPos()));
+    Node n = graph.getNodeWithRoom(end_room);
+
+    new_path_list.add((x : n.getXPos(), y : n.getYPos(), d : Direction.nd));
     return new_path_list;
   } else if (end_room == "Destination") {
-    new_path_list.add((x : graph.getNodeWithRoom(start_room).getXPos(), y : graph.getNodeWithRoom(start_room).getYPos()));
+    Node n = graph.getNodeWithRoom(start_room);
+
+    new_path_list.add((x : n.getXPos(), y : n.getYPos(), d : Direction.nd));
     return new_path_list;
   }
 
@@ -383,12 +426,67 @@ Future<List<({int x, int y})>> loadPath(Graph graph, String start_room, String e
   var indexed_list = path.entries.toList();
 
   // save the nodes in the path as a list of x and y coordinates
-  for (var entry in indexed_list) {
-    if (entry.key.getFloorAndIndex().floor == floor) {
-      new_path_list.add((x : entry.key.getXPos(), y : entry.key.getYPos()));
+  for (int i = 0; i < indexed_list.length; i++) {
+    Node n = indexed_list[i].key;
+
+    if (n.getFloorAndIndex().floor == floor) {
+      bool changeInFloor = false;
+
+      for(String s in n.getRooms()) {
+        if(s.substring(0, 3) == "STR" || s.substring(0, 4) == "ELEV") {
+          changeInFloor = true;
+          break;
+        }
+      }
+
+      // if the node is a stair and it is not the last element of the path, set the direction
+      if(changeInFloor && i + 1 < indexed_list.length) {
+        Node next = indexed_list[i + 1].key;
+
+        Direction d = n.getFloorAndIndex().floor < next.getFloorAndIndex().floor ? Direction.up : Direction.down;
+
+        new_path_list.add((x : n.getXPos(), y : n.getYPos(), d : d));
+      }
+      // if the node is not a stair or is a stair at the end of the path, unset the direction
+      else {
+        new_path_list.add((x : n.getXPos(), y : n.getYPos(), d : Direction.nd));
+      }
     }
   }
+
   return new_path_list;
+}
+
+Future<List<Building>> loadBuildings(String JSON) async {
+  List<Building> out = [];
+
+  String input = await rootBundle.loadString(JSON);
+  var file = jsonDecode(input);
+
+  Map buildingsMap = file["buildings"];
+  List<String> buildingsKeys = List<String>.from(buildingsMap.keys.toList());
+
+  // for each building, get its data, load it into a building object, load it's graph, save it in return list
+  for (int i = 0; i < buildingsKeys.length; i++) {
+    String title = buildingsKeys[i];
+    Map buildingData = buildingsMap[title];
+    int defaultFloor = buildingData["default floor"];
+    // create new building with the data from buildingData in the JSON
+    Building building = Building(title, defaultFloor);
+    Map floorsData = buildingData["floors"];
+    List<String> floors = List<String>.from(floorsData.keys.toList());
+    // add each floor in the building class
+    for (int x = 0; x < floors.length; x++) {
+      Map individualFloorMap = floorsData[floors[x]];
+      building.addFloor(floors[x], individualFloorMap["JSON"], individualFloorMap["PNG"]);
+    }
+
+    // load the graph for this building
+    await building.loadGraph(building.getJSONs());
+    out.add(building);
+  }
+
+  return out;
 }
 
 void main() async {
@@ -397,21 +495,35 @@ void main() async {
   // SettingsView.
   // NATIVE GRAPH INSTANCE
   Graph core_graph = Graph();
+  List<Building> buildings = [];
+
+  /*
+  Building library = Building("library");
 
   // floorplan json files
   String floor6JSON = "assets/data/library_tower_floor_6_data.json";
   String floor7JSON = "assets/data/library_tower_floor_7_data.json";
   String floor8JSON = "assets/data/library_tower_floor_8_data.json";
-  List<String> floorPlansJSONs = [floor6JSON, floor7JSON, floor8JSON];
 
   // floorplan image files
   String floor6PNG = "assets/images/library_tower_floor_6.png";
   String floor7PNG = "assets/images/library_tower_floor_7.png";
   String floor8PNG = "assets/images/library_tower_floor_8.png";
-  List<String> floorPlansPNGs = ["", "", "", "", "", "", floor6PNG, floor7PNG, floor8PNG];
+
+  for (int i = 0; i < 6; i++){
+    library.addFloor("", "");
+  }
+  library.addFloor(floor6JSON, floor6PNG);
+  library.addFloor(floor7JSON, floor7PNG);
+  library.addFloor(floor8JSON, floor8PNG);
+  */
 
   // ensure the core_graph is initialized before starting the app!
   WidgetsFlutterBinding.ensureInitialized();
-  core_graph = await loadGraph(core_graph, floorPlansJSONs);
-  runApp(MyApp(graph: core_graph, floorPlansPNGs: floorPlansPNGs));
+  
+  buildings = await loadBuildings("assets/data/buildings.json");
+  core_graph = await buildings[0].getGraph();
+  
+  //runApp(MyApp(graph: core_graph, floorPlansPNGs: buildings[0].getImages()));
+  runApp(MyApp(buildings: buildings));
 }
