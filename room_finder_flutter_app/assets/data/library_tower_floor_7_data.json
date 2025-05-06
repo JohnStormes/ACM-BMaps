@@ -232,13 +232,13 @@
         "7-38": {
             "xPos": 362,
             "yPos": 555,
-            "rooms": "T701A",
+            "rooms": "",
             "connections": "7-21"
         },
         "7-39": {
             "xPos": 151,
             "yPos": 533,
-            "rooms": "T702",
+            "rooms": "T703",
             "connections": "7-7"
         },
         "7-40": {
@@ -250,7 +250,7 @@
         "7-41": {
             "xPos": 242,
             "yPos": 556,
-            "rooms": "T701B",
+            "rooms": "T701A",
             "connections": "7-24"
         },
         "7-42": {
