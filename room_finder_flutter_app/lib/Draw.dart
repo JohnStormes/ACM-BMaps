@@ -37,6 +37,7 @@ class LinePainter extends CustomPainter {
   Color start_color = const Color.fromRGBO(162, 242, 170, 1);
   Color end_color = const Color.fromRGBO(242, 162, 162, 1);
   final double RADIUS = 5;
+  final double ARROW_SCALAR = 5;
 
   // list of node locations in the path
   final List<({int x, int y, Direction d})> path_list;
@@ -103,7 +104,7 @@ class LinePainter extends CustomPainter {
       else {
         Path p = Path();
 
-        double r = RADIUS * 2;
+        double r = RADIUS * ARROW_SCALAR;
 
         final Paint strokePaint = Paint()
           ..color = Colors.black
@@ -154,7 +155,7 @@ class LinePainter extends CustomPainter {
     else { 
       Path p = Path();
 
-      double r = RADIUS * 2;
+      double r = RADIUS * ARROW_SCALAR;
 
       final Paint strokePaint = Paint()
         ..color = Colors.black

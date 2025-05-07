@@ -24,10 +24,6 @@ class MyApp extends StatelessWidget {
   //final List<String> floorPlansPNGs;
   final List<Building> buildings;
 
-  // INITIALLY SELECTED BUILDING AND FLOOR
-  int currentBuilding = 0;
-  int currentFloor = 6;
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -36,32 +32,374 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
-      home: MyHomePage(
+      home: HomeScreen(
         title: "BMaps",
         buildings: buildings,
-        currentBuilding: currentBuilding,
-        currentFloor: currentFloor
       ),
     );
   }
 }
 
-// widget created in MyApp, which creates the _MyHomePageState custom state
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title, required this.buildings, required this.currentBuilding, required this.currentFloor});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key, required this.title, required this.buildings});
+
+  final String title;
+  // passed in from MyApp when homepage is created
+  final List<Building> buildings;
+
+  @override _HomeScreenState createState() => _HomeScreenState(title, buildings);
+}
+
+// widget created for room selection page in home page
+class _HomeScreenState extends State<HomeScreen> {
+  
+  String title = "";
+  // passed in from MyApp when homepage is created
+  List<Building> buildings = [];
+  int currentBuilding = 0;
+  String building = "Select a building";
+
+  _HomeScreenState(String aTitle, List<Building> aBuildings) {
+    title = aTitle;
+    buildings = aBuildings;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/images/IntroPage.jpg'),
+          fit: BoxFit.cover
+        ),
+      ),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            "BMaps",
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          leading: Image.asset('assets/images/Bing-logo.png'),
+          backgroundColor: BING_GREEN,
+          centerTitle: true
+        ),
+        backgroundColor: Colors.transparent,
+        body: Stack(
+          children: [
+
+            // welcome to BMaps text
+            Align(
+              alignment: Alignment(0, -0.7), // x and y: -1 to 1
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white, // your desired color
+                  borderRadius: BorderRadius.circular(20), // rounded corners
+                ),
+                child: Text(
+                  "Welcome to BMaps!\nTo begin, select a building",
+                  style: TextStyle(
+                    color: BING_GREEN,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold
+                  ),
+                  textAlign: TextAlign.center
+                ),
+              ),
+            ),
+
+            // go! button
+            Align(
+              alignment: Alignment(0, 0.9),
+              child: SizedBox(
+                //width: 140,
+                height: 50,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    if (building != "Select a building") {
+                      _switchToSelectionScreen(context);
+                    }
+                  },
+                  label: Text(
+                    "Go!",
+                    style: const TextStyle(
+                      color: BING_GREEN,
+                      fontSize: 24
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white
+                  ),
+                ),
+              ),
+            ),
+
+            // select building button
+            Align(
+              alignment: Alignment(0, 0),
+              child: SizedBox(
+                height: 60,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    _openSearch();
+                  },
+                  label: Text(
+                    building,
+                    style: const TextStyle(
+                      color: BING_GREEN,
+                      fontSize: 24
+                    ),
+                  ),
+                  icon: const Icon(
+                    Icons.search, 
+                    color: BING_GREEN,
+                    size: 30
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white
+                  ),
+                ),
+              ),
+            ),
+          ]
+        ),
+      ),
+    );
+  }
+
+  // opens a search menu, gets result, and updates the start and destination string variables
+  // finally, it updates the path with loadPath, and reloads the home page
+  void _openSearch() async {
+    final result = await showSearch(
+      context: context,
+      delegate: CustomSearchDelegate.fromBuildings(buildings),
+    );
+    if (building != result && result != null) {
+      setState(() {
+        building = result;
+        for (int i = 0; i < buildings.length; i++) {
+          if (buildings[i].getTitle() == building) {
+            currentBuilding = i;
+          }
+        }
+      });
+    }
+  }
+
+  void _switchToSelectionScreen(BuildContext context) {
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => RoomSelectionScreen(
+        title: title,
+        buildings: buildings,
+        currentBuilding: currentBuilding,
+      )));
+  }
+}
+
+class RoomSelectionScreen extends StatefulWidget {
+  const RoomSelectionScreen({super.key, required this.title, required this.buildings, required this.currentBuilding});
 
   final String title;
   // passed in from MyApp when homepage is created
   final List<Building> buildings;
   final int currentBuilding;
-  final int currentFloor;
 
-  @override _MyHomePageState createState() => _MyHomePageState(buildings, currentBuilding, currentFloor);
+  @override _RoomSelectionScreenState createState() => _RoomSelectionScreenState(title, buildings, currentBuilding);
+}
+
+// widget created for room selection page in home page
+class _RoomSelectionScreenState extends State<RoomSelectionScreen> {
+
+  String title = "";
+  // passed in from MyApp when homepage is created
+  List<Building> buildings = [];
+  Graph graph = Graph();
+  int currentBuilding = 0;
+  int currentFloor = 0;
+
+  String start = "What is the nearest room?";
+  String destination = "Where are you headed?";
+
+  _RoomSelectionScreenState(String aTitle, List<Building> aBuildings, int aCurrentBuilding) {
+    title = aTitle;
+    buildings = aBuildings;
+    currentBuilding = aCurrentBuilding;
+    graph = buildings[currentBuilding].getGraph();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/images/HomePage.jpg'),
+          fit: BoxFit.cover
+        ),
+      ),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            "BMaps",
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          leading: Image.asset('assets/images/Bing-logo.png'),
+          backgroundColor: BING_GREEN,
+          centerTitle: true
+        ),
+        backgroundColor: Colors.transparent,
+        body: Stack(
+          children: [
+
+            // go! button
+            Align(
+              alignment: Alignment(0, 0.9),
+              child: SizedBox(
+                //width: 140,
+                height: 50,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    if (start != "What is the nearest room?" && destination != "Where are you headed?") {
+                      _switchToMainPage(context);
+                    }
+                  },
+                  label: Text(
+                    "Go!",
+                    style: const TextStyle(
+                      color: BING_GREEN,
+                      fontSize: 24
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white
+                  ),
+                ),
+              ),
+            ),
+
+            // left search button
+            Align(
+              alignment: Alignment(0, -0.8),
+              child: SizedBox(
+                height: 50,
+                child: ElevatedButton.icon(
+                  // left search button activates the code below onPressed here
+                  onPressed: () {
+                    _openSearch(0);
+                  },
+                  label: Text(
+                    start,
+                    style: const TextStyle(
+                      color: BING_GREEN,
+                      fontSize: 24
+                    ),
+                  ),
+                  icon: const Icon(
+                    Icons.search, 
+                    color: BING_GREEN,
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white
+                  ),
+                ),
+              ),
+            ),
+
+            // right search button
+            Align(
+              alignment: Alignment(0, -0.5),
+              child: SizedBox(
+                height: 50,
+                child: ElevatedButton.icon(
+                  // right search button activates the code below onPressed here
+                  onPressed: () {
+                    _openSearch(1);
+                  },
+                  label: Text(
+                    destination,
+                    style: const TextStyle(
+                      color: BING_GREEN,
+                      fontSize: 24
+                    ),
+                  ),
+                  icon: const Icon(
+                    Icons.search, 
+                    color: BING_GREEN
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white
+                  ),
+                ),
+              ),
+            ),
+          ]
+        ),
+      ),
+    );
+  }
+
+  void _openSearch(int index) async {
+    final result = await showSearch(
+      context: context,
+      delegate: CustomSearchDelegate(index, graph, buildings),
+    );
+
+    if (result != null && (index == 0 || index == 1)) {
+      setState(() {
+        if (index == 0) {
+          start = result;
+          currentFloor = buildings[currentBuilding].getGraph().getNodeWithRoom(start).getFloorAndIndex().floor;
+        } else if (index == 1) {
+          destination = result;
+        }
+      });
+    }
+  }
+
+  void _switchToMainPage(BuildContext context) {
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyMainPage(
+        start: start,
+        destination: destination,
+        graph: graph,
+        title: title,
+        buildings: buildings,
+        currentBuilding: currentBuilding,
+        currentFloor: currentFloor
+      )));
+  }
+}
+
+
+// widget created in after home page, which creates the _MyMainPageState custom state
+class MyMainPage extends StatefulWidget {
+  const MyMainPage({super.key, required this.start, required this.destination, required this.graph, required this.title
+                    , required this.buildings, required this.currentBuilding, required this.currentFloor});
+
+  final Graph graph;
+  final String title;
+  // passed in from MyApp when homepage is created
+  final List<Building> buildings;
+  final int currentBuilding;
+  final int currentFloor;
+  final String start;
+  final String destination;
+
+  @override _MyMainPageState createState() => _MyMainPageState(start, destination, graph, buildings, currentBuilding, currentFloor);
 }
 
 // PRIMARY HOME PAGE CLASS
 // contains most home page widgets and functionality
-class _MyHomePageState extends State<MyHomePage> {
+class _MyMainPageState extends State<MyMainPage> {
   // these strings change as rooms are selected
   String start = "Start"; 
   String destination = "Destination";
@@ -80,15 +418,25 @@ class _MyHomePageState extends State<MyHomePage> {
   List<({int x, int y, Direction d})> path_list = [];
 
   // pass in aCurrentBuilding and aCurrentFloor when initializing app
-  _MyHomePageState(List<Building> aBuildings, int aCurrentBuilding, int aCurrentFloor) {
+  _MyMainPageState(String aStart, String aDestination, Graph aGraph, List<Building> aBuildings, int aCurrentBuilding, int aCurrentFloor) {
+    start = aStart;
+    destination = aDestination;
     buildings = aBuildings;
     currentBuilding = aCurrentBuilding;
     building = buildings[currentBuilding].getTitle();
-    graph = buildings[currentBuilding].getGraph();
+    graph = aGraph;
     floorPlansPNGs = buildings[currentBuilding].getImages();
     _floorValue = aCurrentFloor;
     _dropDownItems = buildings[currentBuilding].getFloorNames();
     _dropDownValue = _dropDownItems[_floorValue];
+    _initializePath();
+  }
+
+  void _initializePath() async {
+    final list = await loadPath(graph, start, destination, _floorValue);
+    setState(() {
+      path_list = list;
+    });
   }
 
   // opens a search menu, gets result, and updates the start and destination string variables
@@ -327,6 +675,12 @@ class CustomSearchDelegate extends SearchDelegate {
     }
   }
 
+  CustomSearchDelegate.fromBuildings(List<Building> aBuildings) {
+    for (int i = 0; i < aBuildings.length; i++) {
+      search_terms.add(aBuildings[i].getTitle());
+    }
+  }
+
   @override
   // button to clear the search list
   List<Widget> buildActions(BuildContext context) {
@@ -433,7 +787,7 @@ Future<List<({int x, int y, Direction d})>> loadPath(Graph graph, String start_r
       bool changeInFloor = false;
 
       for(String s in n.getRooms()) {
-        if(s.substring(0, 3) == "STR" || s.substring(0, 4) == "ELEV") {
+        if((s.length >= 3 && s.substring(0, 3) == "STR") || (s.length >= 4 && s.substring(0, 4) == "ELEV")) {
           changeInFloor = true;
           break;
         }
@@ -496,27 +850,6 @@ void main() async {
   // NATIVE GRAPH INSTANCE
   Graph core_graph = Graph();
   List<Building> buildings = [];
-
-  /*
-  Building library = Building("library");
-
-  // floorplan json files
-  String floor6JSON = "assets/data/library_tower_floor_6_data.json";
-  String floor7JSON = "assets/data/library_tower_floor_7_data.json";
-  String floor8JSON = "assets/data/library_tower_floor_8_data.json";
-
-  // floorplan image files
-  String floor6PNG = "assets/images/library_tower_floor_6.png";
-  String floor7PNG = "assets/images/library_tower_floor_7.png";
-  String floor8PNG = "assets/images/library_tower_floor_8.png";
-
-  for (int i = 0; i < 6; i++){
-    library.addFloor("", "");
-  }
-  library.addFloor(floor6JSON, floor6PNG);
-  library.addFloor(floor7JSON, floor7PNG);
-  library.addFloor(floor8JSON, floor8PNG);
-  */
 
   // ensure the core_graph is initialized before starting the app!
   WidgetsFlutterBinding.ensureInitialized();
