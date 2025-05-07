@@ -111,6 +111,11 @@ class Graph {
       }
     }
 
+    // if there isn't a path, return an empty map
+    if (previous[destination] == null && source != destination) {
+      return {};
+    }
+
     // reconstruct the path from destination to source
     Map<Node, int> shortest_path = {};
     Node? current = destination;
