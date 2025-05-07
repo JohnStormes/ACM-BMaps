@@ -38,6 +38,26 @@
                 "floor 8": {
                     "JSON": "assets/data/library_tower_floor_8_data.json",
                     "PNG": "assets/images/library_tower_floor_8.png"
+                },
+                "floor 9": {
+                    "JSON": "assets/data/library_tower_floor_9_data.json",
+                    "PNG": "assets/images/library_tower_floor_9.png"
+                },
+                "floor 10": {
+                    "JSON": "assets/data/library_tower_floor_10_data.json",
+                    "PNG": "assets/images/library_tower_floor_10.png"
+                },
+                "floor 11": {
+                    "JSON": "assets/data/library_tower_floor_11_data.json",
+                    "PNG": "assets/images/library_tower_floor_11.png"
+                },
+                "floor 12": {
+                    "JSON": "assets/data/library_tower_floor_12_data.json",
+                    "PNG": "assets/images/library_tower_floor_12.png"
+                },
+                "floor 13": {
+                    "JSON": "assets/data/library_tower_floor_13_data.json",
+                    "PNG": "assets/images/library_tower_floor_13.png"
                 }
             }
         },
