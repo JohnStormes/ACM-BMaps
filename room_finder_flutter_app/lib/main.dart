@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
 
   // INITIALLY SELECTED BUILDING AND FLOOR
   int currentBuilding = 0;
-  int currentFloor = 6;
+  int currentFloor = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -433,7 +433,7 @@ Future<List<({int x, int y, Direction d})>> loadPath(Graph graph, String start_r
       bool changeInFloor = false;
 
       for(String s in n.getRooms()) {
-        if(s.substring(0, 3) == "STR" || s.substring(0, 4) == "ELEV") {
+        if((s.length >= 3 && s.substring(0, 3) == "STR") || (s.length >= 4 && s.substring(0, 4) == "ELEV")) {
           changeInFloor = true;
           break;
         }
@@ -496,27 +496,6 @@ void main() async {
   // NATIVE GRAPH INSTANCE
   Graph core_graph = Graph();
   List<Building> buildings = [];
-
-  /*
-  Building library = Building("library");
-
-  // floorplan json files
-  String floor6JSON = "assets/data/library_tower_floor_6_data.json";
-  String floor7JSON = "assets/data/library_tower_floor_7_data.json";
-  String floor8JSON = "assets/data/library_tower_floor_8_data.json";
-
-  // floorplan image files
-  String floor6PNG = "assets/images/library_tower_floor_6.png";
-  String floor7PNG = "assets/images/library_tower_floor_7.png";
-  String floor8PNG = "assets/images/library_tower_floor_8.png";
-
-  for (int i = 0; i < 6; i++){
-    library.addFloor("", "");
-  }
-  library.addFloor(floor6JSON, floor6PNG);
-  library.addFloor(floor7JSON, floor7PNG);
-  library.addFloor(floor8JSON, floor8PNG);
-  */
 
   // ensure the core_graph is initialized before starting the app!
   WidgetsFlutterBinding.ensureInitialized();

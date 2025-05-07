@@ -1,11 +1,11 @@
 {
     "buildings": {
         "library": {
-            "default floor": 6,
+            "default floor": 0,
             "floors": {
                 "floor 0": {
-                    "JSON": "",
-                    "PNG": ""
+                    "JSON": "assets/data/library_ground_floor_data.json",
+                    "PNG": "assets/images/library_ground_floor.png"
                 },
                 "floor 1": {
                     "JSON": "",
