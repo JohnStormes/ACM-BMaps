@@ -203,13 +203,13 @@
             "xPos": 308,
             "yPos": 272,
             "rooms": "STR11",
-            "connections": "11-11, 6-33, 7-34"
+            "connections": "11-11, 10-33, 12-34"
         },
         "11-34": {
             "xPos": 349,
             "yPos": 396,
             "rooms": "STR11",
-            "connections": "11-16, 6-34, 7-33"
+            "connections": "11-16, 10-34, 12-33"
         },
         "11-35": {
             "xPos": 465,
@@ -257,13 +257,13 @@
             "xPos": 273,
             "yPos": 450,
             "rooms": "ELEV24",
-            "connections": "11-23, 6-42, 7-42"
+            "connections": "11-23, 10-42, 12-42"
         },
         "11-43": {
             "xPos": 339,
             "yPos": 453,
             "rooms": "ELEV25",
-            "connections": "11-22, 6-43, 7-43"
+            "connections": "11-22, 10-43, 12-43"
         },
         "11-44": {
             "xPos": 215,
