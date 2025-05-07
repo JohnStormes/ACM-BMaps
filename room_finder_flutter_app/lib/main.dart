@@ -118,7 +118,6 @@ class _HomeScreenState extends State<HomeScreen> {
             Align(
               alignment: Alignment(0, 0.9),
               child: SizedBox(
-                //width: 140,
                 height: 50,
                 child: ElevatedButton.icon(
                   onPressed: () {
@@ -127,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     }
                   },
                   label: Text(
-                    "Go!",
+                    "Continue to room selection",
                     style: const TextStyle(
                       color: BING_GREEN,
                       fontSize: 24
@@ -289,7 +288,7 @@ class _RoomSelectionScreenState extends State<RoomSelectionScreen> {
 
             // left search button
             Align(
-              alignment: Alignment(0, -0.8),
+              alignment: Alignment(0, -0.3),
               child: SizedBox(
                 height: 50,
                 child: ElevatedButton.icon(
@@ -317,7 +316,7 @@ class _RoomSelectionScreenState extends State<RoomSelectionScreen> {
 
             // right search button
             Align(
-              alignment: Alignment(0, -0.5),
+              alignment: Alignment(0, -0),
               child: SizedBox(
                 height: 50,
                 child: ElevatedButton.icon(
@@ -417,6 +416,10 @@ class _MyMainPageState extends State<MyMainPage> {
   // list of values for the current path
   List<({int x, int y, Direction d})> path_list = [];
 
+  // controls where the starting point of the image is
+  TransformationController _controller = TransformationController();
+  final double zoom = 1.5;
+
   // pass in aCurrentBuilding and aCurrentFloor when initializing app
   _MyMainPageState(String aStart, String aDestination, Graph aGraph, List<Building> aBuildings, int aCurrentBuilding, int aCurrentFloor) {
     start = aStart;
@@ -430,8 +433,71 @@ class _MyMainPageState extends State<MyMainPage> {
     _dropDownItems = buildings[currentBuilding].getFloorNames();
     _dropDownValue = _dropDownItems[_floorValue];
     _initializePath();
+
+    // set starting position of the image
+    _resetImagePosition();
   }
 
+  // opens an alert box telling the user a path could not be found
+  // index: 0 - are you lost? button
+  // index: 1 - could not find path
+  showAlertDialog(BuildContext context, int index) {
+    String title = "";
+    String content = "";
+
+    if (index == 0) {
+      title = "If you're lost:";
+      content = "1. Find the nearest marked room\n2. Enter that room as your start location";
+    } else if (index == 1) {
+      title = "Could not find path";
+      content = "There is no known path from your location to room $destination";
+    }
+
+    Widget okButton = TextButton(
+      child: Text(
+        "OK",
+        style: TextStyle(
+          color: BING_GREEN
+        )
+      ),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text(title),
+      content: Text(content),
+      actions: [
+        okButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  // resets the starting position of the image when the user selects a new starting point
+  void _resetImagePosition() {
+    // set starting position of the image
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final size = MediaQuery.of(context).size;
+      Node startNodeTemp = graph.getNodeWithRoom(start);
+      double xPos = size.width / 2 - startNodeTemp.getXPos().toDouble() * zoom;
+      double yPos = size.height / 2 - startNodeTemp.getYPos().toDouble() * zoom;
+      _controller.value = Matrix4.identity()
+        ..scale(zoom)
+        ..translate(xPos / zoom, yPos / zoom);
+    });
+  }
+
+  // initializes the path with the current values
   void _initializePath() async {
     final list = await loadPath(graph, start, destination, _floorValue);
     setState(() {
@@ -451,6 +517,10 @@ class _MyMainPageState extends State<MyMainPage> {
       setState(() {
         if (index == 0) {
           start = result;
+          if (graph.getNodeWithRoom(start).getFloorAndIndex().floor != _floorValue) {
+            _floorValue = graph.getNodeWithRoom(start).getFloorAndIndex().floor;
+            _dropDownValue = _dropDownItems[_floorValue];
+          }
         } else if (index == 1) {
           destination = result;
         }
@@ -459,6 +529,12 @@ class _MyMainPageState extends State<MyMainPage> {
       // reload home page
       setState(() {
         path_list = list;
+        if (index == 0) {
+          _resetImagePosition();
+        }
+        if (path_list.isEmpty) {
+          showAlertDialog(context, 1);
+        }
       });
     } else if (result != null && (index == 2)) {
       print(result);
@@ -531,6 +607,7 @@ class _MyMainPageState extends State<MyMainPage> {
           // centered interactive viewer
           Center(
             child: InteractiveViewer(
+              transformationController: _controller,
               constrained: false,
               boundaryMargin: EdgeInsets.all(200.0),
               minScale: 0.1,
@@ -542,6 +619,29 @@ class _MyMainPageState extends State<MyMainPage> {
           ),
 
           // buttons
+
+          // lost button
+          Align(
+            alignment: Alignment(-0.98, -0.98),
+            child: SizedBox(
+              height: 30,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  showAlertDialog(context, 0);
+                },
+                label: Text(
+                  "lost?",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: BING_GREEN
+                ),
+              ),
+            ),
+          ),
 
           // left search button
           Positioned(
@@ -634,7 +734,11 @@ class _MyMainPageState extends State<MyMainPage> {
                     onChanged: (String? newValue) async {
                       setState(() {
                         _dropDownValue = newValue!;
-                        _floorValue = int.parse(_dropDownValue.split(' ')[1]);
+                        for (int i = 0; i < _dropDownItems.length; i++) {
+                          if (_dropDownItems[i] == _dropDownValue) {
+                            _floorValue = i;
+                          }
+                        }
                       });
 
                       if (start != "Start" && destination != "Destination") {
@@ -848,14 +952,12 @@ void main() async {
   // SettingsController for changes, then passes it further down to the
   // SettingsView.
   // NATIVE GRAPH INSTANCE
-  Graph core_graph = Graph();
   List<Building> buildings = [];
 
   // ensure the core_graph is initialized before starting the app!
   WidgetsFlutterBinding.ensureInitialized();
   
   buildings = await loadBuildings("assets/data/buildings.json");
-  core_graph = await buildings[0].getGraph();
   
   //runApp(MyApp(graph: core_graph, floorPlansPNGs: buildings[0].getImages()));
   runApp(MyApp(buildings: buildings));
