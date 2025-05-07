@@ -734,7 +734,11 @@ class _MyMainPageState extends State<MyMainPage> {
                     onChanged: (String? newValue) async {
                       setState(() {
                         _dropDownValue = newValue!;
-                        _floorValue = int.parse(_dropDownValue.split(' ')[1]);
+                        for (int i = 0; i < _dropDownItems.length; i++) {
+                          if (_dropDownItems[i] == _dropDownValue) {
+                            _floorValue = i;
+                          }
+                        }
                       });
 
                       if (start != "Start" && destination != "Destination") {

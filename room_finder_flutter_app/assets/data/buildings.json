@@ -3,7 +3,7 @@
         "library": {
             "default floor": 0,
             "floors": {
-                "floor 0": {
+                "basement": {
                     "JSON": "assets/data/library_ground_floor_data.json",
                     "PNG": "assets/images/library_ground_floor.png"
                 },
