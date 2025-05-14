@@ -8,8 +8,8 @@
                     "PNG": "assets/images/library_ground_floor.png"
                 },
                 "floor 1": {
-                    "JSON": "",
-                    "PNG": ""
+                    "JSON": "assets/data/library_floor_1_data.json",
+                    "PNG": "assets/images/library_floor_1.png"
                 },
                 "floor 2": {
                     "JSON": "",
