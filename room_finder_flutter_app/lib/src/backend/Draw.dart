@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'src/backend/graph.dart';
-import 'src/backend/node.dart';
+import 'graph.dart';
+import 'node.dart';
 
 // This class is a widget containing the floor plan image,
 // and the linepainter on top of the image.
