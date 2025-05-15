@@ -11,14 +11,10 @@ const Color BING_GREEN =Color.fromRGBO(0, 93, 64, 1);
 class MyApp extends StatelessWidget {
   const MyApp({
     super.key,
-    //required this.graph,
-    //required this.floorPlansPNGs
     required this.buildings
   });
 
   // passed in from main when app is started
-  //final Graph graph;
-  //final List<String> floorPlansPNGs;
   final List<Building> buildings;
 
   @override
@@ -70,10 +66,6 @@ Future<List<Building>> loadBuildings(String JSON) async {
 }
 
 void main() async {
-  // Run the app and pass in the SettingsController. The app listens to the
-  // SettingsController for changes, then passes it further down to the
-  // SettingsView.
-  // NATIVE GRAPH INSTANCE
   List<Building> buildings = [];
 
   // ensure the core_graph is initialized before starting the app!
@@ -81,6 +73,5 @@ void main() async {
   
   buildings = await loadBuildings("assets/data/buildings.json");
   
-  //runApp(MyApp(graph: core_graph, floorPlansPNGs: buildings[0].getImages()));
   runApp(MyApp(buildings: buildings));
 }
