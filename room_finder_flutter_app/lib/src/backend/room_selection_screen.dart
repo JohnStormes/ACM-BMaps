@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'building.dart';
-import 'CustomSearch.dart';
+import 'custom_search.dart';
 import 'graph.dart';
-import 'MainPage.dart';
+import 'main_page.dart';
 
 const Color BING_GREEN =Color.fromRGBO(0, 93, 64, 1);
 

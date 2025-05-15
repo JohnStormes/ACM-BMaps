@@ -2,18 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:room_finder_flutter_app/src/backend/node.dart';
-import 'src/backend/Draw.dart';
 import 'src/backend/building.dart';
-import 'src/backend/HomeScreen.dart';
-
-import 'src/backend/graph.dart';
+import 'src/backend/home_screen.dart';
 
 const Color BING_GREEN =Color.fromRGBO(0, 93, 64, 1);
 
 /// The Widget that configures your application.
 class MyApp extends StatelessWidget {
-  MyApp({
+  const MyApp({
     super.key,
     //required this.graph,
     //required this.floorPlansPNGs

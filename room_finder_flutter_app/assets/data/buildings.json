@@ -12,20 +12,20 @@
                     "PNG": "assets/images/library_floor_1.png"
                 },
                 "floor 2": {
-                    "JSON": "",
-                    "PNG": ""
+                    "JSON": "assets/data/library_floor_2_data.json",
+                    "PNG": "assets/images/library_floor_2.png"
                 },
                 "floor 3": {
-                    "JSON": "",
-                    "PNG": ""
+                    "JSON": "assets/data/library_floor_3_data.json",
+                    "PNG": "assets/images/library_floor_3.png"
                 },
                 "floor 4": {
                     "JSON": "",
-                    "PNG": ""
+                    "PNG": "assets/images/library_floor_4.png"
                 },
                 "floor 5": {
                     "JSON": "",
-                    "PNG": ""
+                    "PNG": "assets/images/library_floor_5.png"
                 },
                 "floor 6": {
                     "JSON": "assets/data/library_tower_floor_6_data.json",
