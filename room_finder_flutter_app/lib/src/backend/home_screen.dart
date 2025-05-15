@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'building.dart';
-import 'CustomSearch.dart';
-import 'RommSelectionScreen.dart';
+import 'custom_search.dart';
+import 'room_selection_screen.dart';
 
 const Color BING_GREEN =Color.fromRGBO(0, 93, 64, 1);
 
