@@ -14,6 +14,10 @@ class CustomSearchDelegate extends SearchDelegate {
     graph = aGraph;
     if (button_index == 0 || button_index == 1) {
       search_terms = graph.getRoomsList();
+      if (button_index == 1) {
+        search_terms.insert(0, "NEAREST MENS BATHROOM");
+        search_terms.insert(0, "NEAREST WOMENS BATHROOM");
+      }
     } else if (button_index == 2) {
       for (int i = 0; i < aBuildings.length; i++) {
         search_terms.add(aBuildings[i].getTitle());

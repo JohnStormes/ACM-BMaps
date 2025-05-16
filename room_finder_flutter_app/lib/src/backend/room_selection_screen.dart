@@ -28,6 +28,8 @@ class _RoomSelectionScreenState extends State<RoomSelectionScreen> {
   int currentBuilding = 0;
   int currentFloor = 0;
 
+  bool elevatorsOnly = false;
+
   String start = "What is the nearest room?";
   String destination = "Where are you headed?";
 
@@ -93,13 +95,13 @@ class _RoomSelectionScreenState extends State<RoomSelectionScreen> {
               ),
             ),
 
-            // left search button
+            // top search button
             Align(
               alignment: Alignment(0, -0.3),
               child: SizedBox(
                 height: 50,
                 child: ElevatedButton.icon(
-                  // left search button activates the code below onPressed here
+                  // top search button activates the code below onPressed here
                   onPressed: () {
                     _openSearch(0);
                   },
@@ -121,13 +123,13 @@ class _RoomSelectionScreenState extends State<RoomSelectionScreen> {
               ),
             ),
 
-            // right search button
+            // bottom search button
             Align(
               alignment: Alignment(0, -0),
               child: SizedBox(
                 height: 50,
                 child: ElevatedButton.icon(
-                  // right search button activates the code below onPressed here
+                  // bottom search button activates the code below onPressed here
                   onPressed: () {
                     _openSearch(1);
                   },
@@ -145,6 +147,39 @@ class _RoomSelectionScreenState extends State<RoomSelectionScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white
                   ),
+                ),
+              ),
+            ),
+
+            // check box
+            Align(
+              alignment: const Alignment(0, 0.2),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 1),
+                decoration: BoxDecoration(
+                  color: Colors.white, // 👈 background color here
+                  borderRadius: BorderRadius.circular(8), // optional: rounded corners
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Checkbox(
+                      value: elevatorsOnly,
+                      onChanged: (value) {
+                        setState(() {
+                          elevatorsOnly = value!;
+                        });
+                      },
+                      checkColor: Colors.white,
+                    ),
+                    const Text(
+                      'Use only elevators',
+                      style: TextStyle(
+                        color: BING_GREEN,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -180,7 +215,8 @@ class _RoomSelectionScreenState extends State<RoomSelectionScreen> {
         title: title,
         buildings: buildings,
         currentBuilding: currentBuilding,
-        currentFloor: currentFloor
+        currentFloor: currentFloor,
+        elevatorsOnly: elevatorsOnly
       )));
   }
 }

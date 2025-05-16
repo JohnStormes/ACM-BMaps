@@ -75,7 +75,7 @@ class Node
   {
     return _hasRooms;
   }
-  Set getRooms()
+  Set<String> getRooms()
   {
     return _rooms;
   }

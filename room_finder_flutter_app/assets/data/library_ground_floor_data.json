@@ -688,13 +688,13 @@
         "0-114": {
             "xPos": 1033,
             "yPos": 1876,
-            "rooms": "G557",
+            "rooms": "G557,BATH,WOMEN",
             "connections": "0-128"
         },
         "0-115": {
             "xPos": 959,
             "yPos": 1876,
-            "rooms": "G555",
+            "rooms": "G555,BATH,MEN",
             "connections": "0-129"
         },
         "0-116": {
@@ -1114,7 +1114,7 @@
         "0-185": {
             "xPos": 1777,
             "yPos": 1639,
-            "rooms": "G411",
+            "rooms": "G411,BATH,WOMEN",
             "connections": "0-186"
         },
         "0-186": {
@@ -1126,7 +1126,7 @@
         "0-187": {
             "xPos": 1665,
             "yPos": 1640,
-            "rooms": "G415",
+            "rooms": "G415,BATH,MEN",
             "connections": "0-188"
         },
         "0-188": {
@@ -1210,7 +1210,7 @@
         "0-201": {
             "xPos": 1893,
             "yPos": 2032,
-            "rooms": "G691",
+            "rooms": "G691,BATH,WOMEN",
             "connections": "0-203,0-202"
         },
         "0-202": {
@@ -1246,7 +1246,7 @@
         "0-207": {
             "xPos": 1892,
             "yPos": 2096,
-            "rooms": "G687",
+            "rooms": "G687,BATH,MEN",
             "connections": "0-208,0-206"
         },
         "0-208": {
@@ -2302,13 +2302,13 @@
         "0-383": {
             "xPos": 931,
             "yPos": 1206,
-            "rooms": "G74",
+            "rooms": "G74,BATH,MEN",
             "connections": "0-671"
         },
         "0-384": {
             "xPos": 934,
             "yPos": 1186,
-            "rooms": "G76",
+            "rooms": "G76,BATH,WOMEN",
             "connections": "0-670"
         },
         "0-385": {
@@ -2656,7 +2656,7 @@
         "0-442": {
             "xPos": 600,
             "yPos": 540,
-            "rooms": "G23",
+            "rooms": "G23,BATH,MEN",
             "connections": "0-441"
         },
         "0-443": {
@@ -3106,7 +3106,7 @@
         "0-517": {
             "xPos": 932,
             "yPos": 305,
-            "rooms": "G06A",
+            "rooms": "G06A,BATH,WOMEN",
             "connections": "0-516"
         },
         "0-518": {
@@ -3118,7 +3118,7 @@
         "0-519": {
             "xPos": 934,
             "yPos": 451,
-            "rooms": "G07A",
+            "rooms": "G07A,BATH,MEN",
             "connections": "0-518"
         },
         "0-520": {

@@ -220,13 +220,13 @@
         "2-36": {
             "xPos": 735,
             "yPos": 364,
-            "rooms": "2446",
+            "rooms": "2446,BATH,MEN",
             "connections": "2-243"
         },
         "2-37": {
             "xPos": 734,
             "yPos": 415,
-            "rooms": "2448",
+            "rooms": "2448,BATH,WOMEN",
             "connections": "2-240"
         },
         "2-38": {
@@ -706,13 +706,13 @@
         "2-117": {
             "xPos": 616,
             "yPos": 816,
-            "rooms": "2311",
+            "rooms": "2311,BATH,WOMEN",
             "connections": "2-299"
         },
         "2-118": {
             "xPos": 641,
             "yPos": 816,
-            "rooms": "2312",
+            "rooms": "2312,BATH,MEN",
             "connections": "2-297"
         },
         "2-119": {
@@ -904,13 +904,13 @@
         "2-150": {
             "xPos": 1028,
             "yPos": 1188,
-            "rooms": "2517",
+            "rooms": "2517,BATH,WOMEN",
             "connections": "2-361"
         },
         "2-151": {
             "xPos": 1033,
             "yPos": 1224,
-            "rooms": "2519",
+            "rooms": "2519,BATH,MEN",
             "connections": "2-360"
         },
         "2-152": {
@@ -982,25 +982,25 @@
         "2-163": {
             "xPos": 1101,
             "yPos": 1322,
-            "rooms": "2523E",
+            "rooms": "2523E,BATH,WOMEN",
             "connections": "2-162"
         },
         "2-164": {
             "xPos": 1027,
             "yPos": 1321,
-            "rooms": "2523C",
+            "rooms": "2523C,BATH,MEN",
             "connections": "2-160"
         },
         "2-165": {
             "xPos": 1140,
             "yPos": 1173,
-            "rooms": "2515",
+            "rooms": "2515,BATH,WOMEN",
             "connections": "2-386"
         },
         "2-166": {
             "xPos": 1143,
             "yPos": 1248,
-            "rooms": "2513",
+            "rooms": "2513,BATH,MEN",
             "connections": "2-387"
         },
         "2-167": {
