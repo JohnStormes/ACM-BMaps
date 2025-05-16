@@ -280,7 +280,7 @@
         "9-46": {
             "xPos": 266,
             "yPos": 362,
-            "rooms": "T918",
+            "rooms": "T918,BATH,MEN,WOMEN",
             "connections": "9-4"
         },
         "9-47": {

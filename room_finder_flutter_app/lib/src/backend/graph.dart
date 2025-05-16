@@ -63,21 +63,60 @@ class Graph {
     return (sqrt(pow(n1.getXPos() - n2.getXPos(), 2) + pow(n1.getYPos() - n2.getYPos(), 2))).toInt();
   }
 
+  // get if a node is a stair or an elevator, and return null if neither
+  String ?getConnectorID(Node node) {
+    if (node.getRooms().isEmpty) {
+      return null;
+    }
+    String room = node.getRooms().toList()[0];
+    if (room.contains("STR") == false && room.contains("ELEV") == false) {
+      return null;
+    }
+    return room;
+  }
+
+  // return if the given node contains a bathroom
+  bool isBathroomNode(Node node, String dest) {
+    Set<String> rooms = node.getRooms();
+    String key = "not bathroom";
+    if (rooms.isEmpty) {
+      return false;
+    }
+
+    if (dest == "NEAREST MENS BATHROOM") {
+      key = "MEN";
+    } else if (dest == "NEAREST WOMENS BATHROOM") {
+      key = "WOMEN";
+    }
+
+    if (rooms.contains("BATH") && rooms.contains(key)) {
+      return true;
+    }
+    return false;
+  }
+
   // finds the shortest path from source_room to dest_room in the given graph, and returns
   // the path as a map of Node - distance pairings. The distances are just there for later
   // use if needed, but for now the implementation of this function turns the map into a list
   // of x-y coordinates in Main.dart -> loadPath
-  Map<Node, int> pathFinder(Graph graph, String source_room, String dest_room){
+  Map<Node, int> pathFinder(Graph graph, String source_room, String dest_room, bool elevatorsOnly){
     Node source = getNodeWithRoom(source_room);
-    Node destination = getNodeWithRoom(dest_room);
+    Node? destination;
+    if (dest_room == "NEAREST MENS BATHROOM" || dest_room == "NEAREST WOMENS BATHROOM") {
+      destination = null;
+    } else {
+      destination = getNodeWithRoom(dest_room);
+    }
     final distances = <Node, int>{};
     final previous = <Node, Node?>{};
     final visited = <Node>{};
 
-    if (source == null || destination == null) {
-      print("null node passed into dijkstras");
-      return Map<Node, int>();
-    }
+    // Determine floor direction: +1 = up, -1 = down, 0 = same floor
+    int sourceFloor = source.getFloorAndIndex().floor;
+    int destFloor = destination?.getFloorAndIndex().floor ?? sourceFloor;
+    int floorDirection = (destFloor - sourceFloor).sign;
+
+    Node? foundBathroom;
 
     // initialize the infinite distances and previous nodes
     for (var node in graph.getNodes().values) {
@@ -95,6 +134,11 @@ class Graph {
 
       visited.add(current);
 
+      if (destination == null && isBathroomNode(current, dest_room)) {
+        foundBathroom = current;
+        break;
+      }
+
       // stop early if we reach the destination
       if (current == destination) break;
 
@@ -102,23 +146,51 @@ class Graph {
         Node? neighbor = graph.getNode(neighbor_key.floor, neighbor_key.index);
         if (neighbor == null || visited.contains(neighbor)) continue;
 
-        int distance = distances[current]! + graph.getDist(current, neighbor);
-        if(distances[neighbor]! > distance){
-          distances[neighbor] = distance;
+        int currentFloor = current.getFloorAndIndex().floor;
+        int neighborFloor = neighbor.getFloorAndIndex().floor;
+        int floorDiff = neighborFloor - currentFloor;
+
+        // disalow vertical movement against intended direction
+        if (destination != null && floorDiff.sign != 0 && floorDiff.sign != floorDirection) {
+          continue;
+        }
+
+        // disalow vertical movement if searching for any bathroom
+        if ((dest_room == "NEAREST MENS BATHROOM" || dest_room == "NEAREST WOMENS BATHROOM") && floorDiff != 0) {
+          continue;
+        }
+
+        // disalow vertical movement on stairs if elevatorsOnly is true
+        if (elevatorsOnly && floorDiff != 0) {
+          bool isElevatorNode = current.getRooms().length == 1 &&
+                                current.getRooms().first.startsWith("ELEV");
+
+          if (!isElevatorNode) {
+            continue; // Not an elevator node; skip vertical move
+          }
+        }
+
+        int baseDistance = graph.getDist(current, neighbor); // typically 0 if vertical
+        int totalDistance = distances[current]! + baseDistance;
+
+        if(distances[neighbor]! > totalDistance){
+          distances[neighbor] = totalDistance;
           previous[neighbor] = current;
           pq.add(neighbor);
         }
       }
     }
 
+    Node? end = destination ?? foundBathroom;
+
     // if there isn't a path, return an empty map
-    if (previous[destination] == null && source != destination) {
+    if (end == null || previous[end] == null && source != end) {
       return {};
     }
 
     // reconstruct the path from destination to source
     Map<Node, int> shortest_path = {};
-    Node? current = destination;
+    Node? current = end;
     while (current != null) {
       shortest_path[current] = distances[current]!;
       current = previous[current];

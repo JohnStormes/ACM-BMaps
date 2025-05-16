@@ -20,11 +20,11 @@
                     "PNG": "assets/images/library_floor_3.png"
                 },
                 "floor 4": {
-                    "JSON": "",
+                    "JSON": "assets/data/library_floor_4_data.json",
                     "PNG": "assets/images/library_floor_4.png"
                 },
                 "floor 5": {
-                    "JSON": "",
+                    "JSON": "assets/data/library_floor_5_data.json",
                     "PNG": "assets/images/library_floor_5.png"
                 },
                 "floor 6": {

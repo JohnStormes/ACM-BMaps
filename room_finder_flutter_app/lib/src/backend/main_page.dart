@@ -10,7 +10,7 @@ const Color BING_GREEN =Color.fromRGBO(0, 93, 64, 1);
 // widget created in after home page, which creates the _MyMainPageState custom state
 class MyMainPage extends StatefulWidget {
   const MyMainPage({super.key, required this.start, required this.destination, required this.graph, required this.title
-                    , required this.buildings, required this.currentBuilding, required this.currentFloor});
+                    , required this.buildings, required this.currentBuilding, required this.currentFloor, required this.elevatorsOnly});
 
   final Graph graph;
   final String title;
@@ -20,8 +20,9 @@ class MyMainPage extends StatefulWidget {
   final int currentFloor;
   final String start;
   final String destination;
+  final bool elevatorsOnly;
 
-  @override _MyMainPageState createState() => _MyMainPageState(start, destination, graph, buildings, currentBuilding, currentFloor);
+  @override _MyMainPageState createState() => _MyMainPageState(start, destination, graph, buildings, currentBuilding, currentFloor, elevatorsOnly);
 }
 
 // PRIMARY HOME PAGE CLASS
@@ -42,6 +43,8 @@ class _MyMainPageState extends State<MyMainPage> {
   int _floorValue = 0;
   List<String> _dropDownItems = [];
 
+  bool elevatorsOnly = false;
+
   // list of values for the current path
   List<({int x, int y, Direction d})> path_list = [];
 
@@ -50,7 +53,7 @@ class _MyMainPageState extends State<MyMainPage> {
   final double zoom = 1.5;
 
   // pass in aCurrentBuilding and aCurrentFloor when initializing app
-  _MyMainPageState(String aStart, String aDestination, Graph aGraph, List<Building> aBuildings, int aCurrentBuilding, int aCurrentFloor) {
+  _MyMainPageState(String aStart, String aDestination, Graph aGraph, List<Building> aBuildings, int aCurrentBuilding, int aCurrentFloor, bool aElevatorsOnly) {
     start = aStart;
     destination = aDestination;
     buildings = aBuildings;
@@ -58,6 +61,7 @@ class _MyMainPageState extends State<MyMainPage> {
     building = buildings[currentBuilding].getTitle();
     graph = aGraph;
     floorPlansPNGs = buildings[currentBuilding].getImages();
+    elevatorsOnly = aElevatorsOnly;
     _floorValue = aCurrentFloor;
     _dropDownItems = buildings[currentBuilding].getFloorNames();
     _dropDownValue = _dropDownItems[_floorValue];
@@ -411,7 +415,7 @@ class _MyMainPageState extends State<MyMainPage> {
     }
 
     // finds path from first to second room
-    path = graph.pathFinder(graph, start_room, end_room);
+    path = graph.pathFinder(graph, start_room, end_room, elevatorsOnly);
     // get the nodes in the path map as a list
     var indexed_list = path.entries.toList();
 

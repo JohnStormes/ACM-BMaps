@@ -59,13 +59,13 @@
             "xPos": 465,
             "yPos": 188,
             "rooms": "ELEV25",
-            "connections": "3-21,2-16"
+            "connections": "3-21,2-16,4-17"
         },
         "3-10": {
             "xPos": 436,
             "yPos": 187,
             "rooms": "ELEV24",
-            "connections": "3-20,2-15"
+            "connections": "3-20,2-15,4-16"
         },
         "3-11": {
             "xPos": 508,
@@ -107,13 +107,13 @@
             "xPos": 454,
             "yPos": 102,
             "rooms": "STR11",
-            "connections": "3-30,2-13"
+            "connections": "3-30,2-13,4-22"
         },
         "3-18": {
             "xPos": 468,
             "yPos": 165,
             "rooms": "STR11",
-            "connections": "3-25,2-14"
+            "connections": "3-25,2-14,4-21"
         },
         "3-19": {
             "xPos": 417,
@@ -226,7 +226,7 @@
         "3-37": {
             "xPos": 432,
             "yPos": 152,
-            "rooms": "T318",
+            "rooms": "T318,BATH,MEN,WOMEN",
             "connections": "3-34"
         },
         "3-38": {
@@ -455,13 +455,13 @@
             "xPos": 1001,
             "yPos": 1098,
             "rooms": "ELEV29",
-            "connections": "3-303,2-148"
+            "connections": "3-303,2-148,4-50"
         },
         "3-76": {
             "xPos": 1030,
             "yPos": 1098,
             "rooms": "ELEV28",
-            "connections": "3-302,2-149"
+            "connections": "3-302,2-149,4-51"
         },
         "3-77": {
             "xPos": 1299,
@@ -911,7 +911,7 @@
             "xPos": 689,
             "yPos": 1312,
             "rooms": "STR2",
-            "connections": "3-152,2-145"
+            "connections": "3-152,2-145,4-44"
         },
         "3-152": {
             "xPos": 689,
@@ -958,32 +958,32 @@
         "3-159": {
             "xPos": 1147,
             "yPos": 1205,
-            "rooms": "3501",
+            "rooms": "3501,BATH,WOMEN",
             "connections": "3-187"
         },
         "3-160": {
             "xPos": 1218,
             "yPos": 1205,
-            "rooms": "3505",
+            "rooms": "3505,BATH,MEN",
             "connections": "3-185"
         },
         "3-161": {
             "xPos": 1061,
             "yPos": 1175,
             "rooms": "STR5",
-            "connections": "3-299"
+            "connections": "3-299,4-52"
         },
         "3-162": {
             "xPos": 1304,
             "yPos": 1218,
             "rooms": "ELEV30",
-            "connections": "3-304,2-173"
+            "connections": "3-304,2-173,4-56"
         },
         "3-163": {
             "xPos": 1304,
             "yPos": 1188,
             "rooms": "ELEV31",
-            "connections": "3-305,2-174"
+            "connections": "3-305,2-174,4-57"
         },
         "3-164": {
             "xPos": 1390,
@@ -1001,7 +1001,7 @@
             "xPos": 1344,
             "yPos": 1307,
             "rooms": "STR1",
-            "connections": "3-181,2-183"
+            "connections": "3-181,2-183,4-59"
         },
         "3-167": {
             "xPos": 1164,
