@@ -32,6 +32,7 @@ class _MyMainPageState extends State<MyMainPage> {
   String start = "Start"; 
   late Node floorStart;
   String destination = "Destination";
+  String destText = "";
   String building = "Building";
   // current building
   List<Building> buildings = [];
@@ -56,6 +57,10 @@ class _MyMainPageState extends State<MyMainPage> {
   _MyMainPageState(String aStart, String aDestination, Graph aGraph, List<Building> aBuildings, int aCurrentBuilding, int aCurrentFloor, bool aElevatorsOnly) {
     start = aStart;
     destination = aDestination;
+    destText = destination;
+    if (destText == "NEAREST MENS BATHROOM" || destText == "NEAREST WOMENS BATHROOM") {
+      destText = "Bathroom";
+    }
     buildings = aBuildings;
     currentBuilding = aCurrentBuilding;
     building = buildings[currentBuilding].getTitle();
@@ -156,6 +161,10 @@ class _MyMainPageState extends State<MyMainPage> {
           }
         } else if (index == 1) {
           destination = result;
+          destText = destination;
+          if (destText == "NEAREST MENS BATHROOM" || destText == "NEAREST WOMENS BATHROOM") {
+            destText = "Bathroom";
+          }
         }
       });
       final list = await loadPath(graph, start, destination, _floorValue);
@@ -318,7 +327,7 @@ class _MyMainPageState extends State<MyMainPage> {
                   _openSearch(1);
                 },
                 label: Text(
-                  destination,
+                  destText,
                   style: const TextStyle(
                     color: Colors.white,
                   ),

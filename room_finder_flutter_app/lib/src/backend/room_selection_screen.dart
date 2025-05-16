@@ -32,12 +32,14 @@ class _RoomSelectionScreenState extends State<RoomSelectionScreen> {
 
   String start = "What is the nearest room?";
   String destination = "Where are you headed?";
+  String destText = "";
 
   _RoomSelectionScreenState(String aTitle, List<Building> aBuildings, int aCurrentBuilding) {
     title = aTitle;
     buildings = aBuildings;
     currentBuilding = aCurrentBuilding;
     graph = buildings[currentBuilding].getGraph();
+    destText = destination;
   }
 
   @override
@@ -134,7 +136,7 @@ class _RoomSelectionScreenState extends State<RoomSelectionScreen> {
                     _openSearch(1);
                   },
                   label: Text(
-                    destination,
+                    destText,
                     style: const TextStyle(
                       color: BING_GREEN,
                       fontSize: 24
@@ -202,6 +204,10 @@ class _RoomSelectionScreenState extends State<RoomSelectionScreen> {
           currentFloor = buildings[currentBuilding].getGraph().getNodeWithRoom(start).getFloorAndIndex().floor;
         } else if (index == 1) {
           destination = result;
+          destText = destination;
+          if (destText == "NEAREST MENS BATHROOM" || destText == "NEAREST WOMENS BATHROOM") {
+            destText = "Bathroom";
+          }
         }
       });
     }
